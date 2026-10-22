@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1E1B4B">
+<title>Snow Kingdom Stories</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky-top:#B9E3FF; --sky-bot:#F0F9FF; --panel:#FFFFFF; --panel-2:#EEF7FF; --line:#C3DFF2;
+  --text:#1D2357; --muted:#4E5889; --pop:#C42A70; --pop-soft:#FFE1EF; --mint:#0B7F69; --mint-soft:#D4F8EE;
+  --gold:#A86F00; --gold-line:#E9A300; --gold-soft:#FFF0C4; --ice:#2373B3; --ice-soft:#DCEFFF;
+  --rock:#86A6D6; --rock-2:#5F80B4; --snow:#FFFFFF; --join:#E2559B; --on-accent:#FFFFFF; --shadow:rgba(29,35,87,.14);
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --sky-top:#141649; --sky-bot:#29297A; --panel:#23286B; --panel-2:#2C327C; --line:#454DA3;
+    --text:#F3F6FF; --muted:#BAC2EE; --pop:#FF73B8; --pop-soft:#4C2763; --mint:#45E3C2; --mint-soft:#1B4D5C;
+    --gold:#FFCB45; --gold-line:#FFCB45; --gold-soft:#4C4231; --ice:#83CEFF; --ice-soft:#26407A;
+    --rock:#5A6FB0; --rock-2:#3E4F8F; --snow:#EEF6FF; --join:#FF7DBB; --on-accent:#12153F; --shadow:rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --sky-top:#141649; --sky-bot:#29297A; --panel:#23286B; --panel-2:#2C327C; --line:#454DA3;
+  --text:#F3F6FF; --muted:#BAC2EE; --pop:#FF73B8; --pop-soft:#4C2763; --mint:#45E3C2; --mint-soft:#1B4D5C;
+  --gold:#FFCB45; --gold-line:#FFCB45; --gold-soft:#4C4231; --ice:#83CEFF; --ice-soft:#26407A;
+  --rock:#5A6FB0; --rock-2:#3E4F8F; --snow:#EEF6FF; --join:#FF7DBB; --on-accent:#12153F; --shadow:rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{min-height:100%;background:var(--sky-bot)}
+body{margin:0;min-height:100vh;font-family:'Fredoka','Nunito','Trebuchet MS',system-ui,sans-serif;font-size:18px;
+  color:var(--text);background:linear-gradient(180deg,var(--sky-top),var(--sky-bot) 70vh,var(--sky-bot));-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--gold-line);outline-offset:3px}
+.wrap{max-width:880px;margin:0 auto;padding:16px 16px 40px}
+h1{font-size:2.1rem;font-weight:700;margin:0;letter-spacing:.01em}
+h2{font-size:1.8rem;margin:0 0 8px}
+p{margin:0 0 10px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.center{justify-content:center}
+.btn{border:0;border-radius:16px;padding:.75em 1.25em;background:var(--ice);color:var(--on-accent);font-weight:600;font-size:1.1rem;
+  cursor:pointer;box-shadow:0 4px 0 var(--shadow);transition:transform .08s}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--shadow)}
+.btn.pop{background:var(--pop)}
+.btn.ghost{background:var(--panel);color:var(--text);border:2px solid var(--line);box-shadow:none}
+.btn.sm{font-size:.95rem;padding:.5em .9em}
+.btn.big{font-size:1.3rem;padding:.85em 1.6em}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.card{background:var(--panel);border-radius:26px;padding:22px;box-shadow:0 6px 0 var(--line)}
+.flakes{font-weight:700;font-size:1.2rem;background:var(--panel);border-radius:999px;padding:.35em .8em;border:2px solid var(--line);white-space:nowrap}
+
+/* home */
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin:8px 0 6px}
+.hi{color:var(--muted);font-size:1.15rem;margin-top:4px}
+.callout{margin:16px 0}
+.trail{list-style:none;margin:22px auto 10px;padding:0;max-width:640px;position:relative}
+.trail::before{content:"";position:absolute;left:50%;top:20px;bottom:20px;border-left:5px dotted var(--snow);transform:translateX(-50%);z-index:0}
+.stop{position:relative;z-index:1;margin:0 0 14px}
+.stop:nth-child(odd){padding-right:18%}
+.stop:nth-child(even){padding-left:18%}
+.stop button{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--panel);border:3px solid var(--line);
+  border-radius:22px;padding:12px 16px;cursor:pointer;box-shadow:0 4px 0 var(--shadow)}
+.disc{flex:none;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:var(--ice);color:var(--on-accent);font-weight:700;font-size:1.5rem}
+.stop .t{display:flex;flex-direction:column;line-height:1.2}
+.stop .t b{font-size:1.2rem}
+.stop .t small{color:var(--muted);font-size:.95rem;margin-top:2px}
+.stars{margin-left:auto;color:var(--gold);font-size:1.25rem;letter-spacing:2px;white-space:nowrap}
+.stop.done .disc{background:var(--mint)}
+.stop.next button{border-color:var(--pop)}
+.stop.next .disc{background:var(--pop)}
+.stop.locked button{opacity:.5;cursor:not-allowed;box-shadow:none}
+.foot{display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:20px}
+.routine{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;list-style:none;padding:0;margin:0}
+.routine li{background:var(--panel);border-radius:999px;padding:.35em .9em;border:2px solid var(--line);font-weight:600}
+.routine li span{display:inline-grid;place-items:center;width:1.5em;height:1.5em;border-radius:50%;background:var(--ice-soft);margin-right:6px;font-size:.9em}
+.grown{position:relative;overflow:hidden;background:transparent;border:2px dashed var(--line);border-radius:14px;padding:.5em 1em;color:var(--muted);cursor:pointer;font-size:.95rem}
+.grown::after{content:"";position:absolute;left:0;bottom:0;height:4px;width:0;background:var(--pop)}
+.grown.holding::after{width:100%;transition:width 2s linear}
+
+/* play */
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.dots{display:flex;gap:7px}
+.d5{width:18px;height:18px;border-radius:50%;background:var(--panel);border:3px solid var(--line)}
+.d5.ok{background:var(--mint);border-color:var(--mint)}
+.d5.miss{background:var(--gold-line);border-color:var(--gold-line)}
+.d5.cur{border-color:var(--pop)}
+.steps{display:flex;gap:6px;list-style:none;padding:0;margin:0 0 12px}
+.steps li{flex:1;text-align:center;padding:.4em .2em;border-radius:999px;background:var(--panel-2);color:var(--muted);font-weight:600;font-size:.98rem}
+.steps li.on{background:var(--ice);color:var(--on-accent)}
+.steps li.done{background:var(--mint-soft);color:var(--mint)}
+.story{background:var(--panel);border-radius:26px;padding:18px 22px;box-shadow:0 6px 0 var(--line);display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start}
+.story .em{font-size:3rem;line-height:1}
+.story p{font-size:1.55rem;line-height:1.45;margin:0 0 10px;max-width:34em}
+.n{background:var(--gold-soft);padding:0 .22em;border-radius:8px;font-weight:700}
+.work{background:var(--panel);border-radius:26px;padding:20px;margin-top:16px;text-align:center;box-shadow:0 6px 0 var(--line)}
+.prompt{font-size:1.4rem;font-weight:600;margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 14px}
+.hint{margin:14px auto 0;font-size:1.15rem;color:var(--pop);min-height:1.4em;max-width:36em;font-weight:500}
+.choices{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));max-width:720px;margin:12px auto 0}
+.choices.two{grid-template-columns:1fr 1fr;max-width:460px}
+.choice{background:var(--panel-2);border:3px solid var(--line);border-radius:18px;padding:16px 14px;font-size:1.25rem;font-weight:600;cursor:pointer;min-height:64px}
+.choice:hover{border-color:var(--ice)}
+.choice.right{border-color:var(--mint);background:var(--mint-soft)}
+.choice.wrong{border-color:var(--pop);background:var(--pop-soft);animation:shake .35s}
+.choice:disabled{cursor:default}
+.eqs .choice{font-size:1.7rem}
+.eq{display:inline-flex;gap:.35em;align-items:center;font-weight:700;letter-spacing:.02em}
+.box{display:inline-block;width:1em;height:1.1em;border:3px solid currentColor;border-radius:6px}
+.eqbig{font-size:2.2rem;margin:4px 0 12px}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* math mountain */
+.mtn{position:relative;width:min(360px,100%);aspect-ratio:360/230;margin:10px auto 6px}
+.mtn svg{position:absolute;inset:0;width:100%;height:100%}
+.mtn.sm{width:min(250px,100%)}
+.slot{position:absolute;transform:translate(-50%,-50%);width:76px;height:60px;border-radius:14px;border:3px dashed var(--ice);
+  background:var(--panel);font-size:1.75rem;font-weight:700;display:grid;place-items:center;cursor:pointer;padding:0}
+.mtn.sm .slot{width:58px;height:46px;font-size:1.3rem;cursor:default}
+.slot.filled{border-style:solid;background:var(--gold-soft);border-color:var(--gold-line)}
+.slot.right{border-color:var(--mint);background:var(--mint-soft)}
+.s-top{left:50%;top:46%}
+.s-l{left:25%;top:80%}
+.s-r{left:75%;top:80%}
+.tray{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:12px 0 6px;min-height:66px}
+.tile{min-width:74px;height:62px;padding:0 14px;border-radius:16px;background:var(--gold-soft);border:3px solid var(--gold-line);font-size:1.75rem;font-weight:700;cursor:pointer;transition:transform .1s}
+.tile.sel{transform:translateY(-6px);background:var(--gold-line);color:#2A1C00;box-shadow:0 6px 0 var(--shadow)}
+.tile.used{visibility:hidden}
+.tile.picked{background:var(--mint-soft);border-color:var(--mint)}
+
+/* comparison bars */
+.bars{display:grid;gap:14px;max-width:560px;margin:12px auto}
+.barrow{display:grid;grid-template-columns:96px 1fr;gap:10px;align-items:center}
+.who{font-weight:700;font-size:1.15rem;text-align:right;overflow-wrap:anywhere}
+.bar{display:flex;height:70px;gap:0}
+.seg{display:flex;align-items:center;justify-content:center;border-radius:14px;background:var(--ice-soft);border:3px solid var(--ice)}
+.seg.extra{border:3px dashed var(--pop);background:transparent;margin-left:4px}
+.seg .slot{position:static;transform:none;width:68px;height:52px}
+.bars.sm .seg{height:52px}
+.bars.sm .seg .slot{width:52px;height:40px;font-size:1.2rem;cursor:default}
+.extra-note{font-size:.9rem;color:var(--pop);text-align:right;margin-top:-6px}
+
+/* circles */
+.frames{display:flex;flex-direction:column;align-items:center;gap:10px;margin:8px 0}
+.frame{display:grid;grid-template-columns:repeat(5,52px);gap:8px;padding:10px;background:var(--panel-2);border-radius:18px;border:2px solid var(--line)}
+.cell{width:52px;height:52px;border-radius:50%;border:2px dashed var(--line);background:transparent;padding:0;cursor:pointer;position:relative}
+.cell.s{background:var(--ice);border:0}
+.cell.j{background:var(--join);border:0}
+.cell.x{opacity:.45}
+.cell.x::after{content:"✕";position:absolute;inset:0;display:grid;place-items:center;font-size:2rem;font-weight:700;color:var(--pop);opacity:1}
+.frames.sm .frame{grid-template-columns:repeat(5,30px);gap:5px;padding:6px}
+.frames.sm .cell{width:30px;height:30px;cursor:default}
+.frames.sm .cell.x::after{font-size:1.2rem}
+.count{font-size:1.4rem;font-weight:700;margin:6px 0 10px}
+
+/* sticks and dots */
+.sdwrap{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin:10px 0}
+.sd{display:inline-flex;align-items:flex-end;gap:5px;padding:8px 12px;background:var(--panel-2);border-radius:14px}
+.stick{width:7px;height:42px;background:var(--ice);border-radius:4px}
+.dot{width:11px;height:11px;border-radius:50%;background:var(--join);margin-bottom:2px}
+.sd b{margin-left:8px;font-size:1.3rem}
+
+/* pad */
+.padshow{font-size:2.6rem;font-weight:700;margin:6px 0 10px;min-height:1.3em}
+.pad{display:grid;grid-template-columns:repeat(3,76px);gap:10px;justify-content:center}
+.pad button{height:62px;border-radius:16px;border:2px solid var(--line);background:var(--panel-2);font-size:1.6rem;font-weight:700;cursor:pointer}
+.pad button.go{background:var(--mint);color:var(--on-accent);border-color:var(--mint);font-size:1.15rem}
+.pad button:disabled{opacity:.4}
+
+/* win, intro, results */
+.win .tick{font-size:3.4rem;color:var(--mint);line-height:1}
+.win .answer{font-size:2.2rem;font-weight:700;margin:4px 0}
+.gain{font-weight:700;color:var(--ice);font-size:1.3rem}
+.intro .idea{font-size:1.4rem;line-height:1.45;max-width:34em}
+.ex{margin:14px 0;padding:14px 18px;background:var(--panel-2);border-left:6px solid var(--ice);border-radius:12px;font-size:1.2rem;line-height:1.45}
+.result{text-align:center}
+.result .big{font-size:3rem;font-weight:700;margin:6px 0}
+.lead{font-size:1.2rem;color:var(--muted)}
+.eqline{font-size:1.8rem;font-weight:700;min-height:1.3em;margin:8px 0}
+
+/* parent */
+.ptable-wrap{overflow-x:auto;margin:10px 0 18px}
+table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{text-align:left;padding:8px 10px;border-bottom:2px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600}
+.chip{display:inline-block;white-space:nowrap;border-radius:999px;padding:.15em .7em;font-weight:600;font-size:.95rem;background:var(--panel-2)}
+.chip.m{background:var(--mint-soft);color:var(--mint)}
+.chip.p{background:var(--gold-soft);color:var(--gold)}
+.settings label{display:flex;align-items:center;gap:10px;margin:10px 0}
+.settings input[type=text]{font:inherit;padding:.4em .6em;border-radius:10px;border:2px solid var(--line);background:var(--panel-2);color:var(--text)}
+.danger{border:2px solid var(--pop);border-radius:18px;padding:14px 16px;margin-top:18px}
+.danger input{font:inherit;padding:.45em .6em;border-radius:10px;border:2px solid var(--line);background:var(--panel-2);color:var(--text)}
+.warn{background:var(--gold-soft);border-radius:12px;padding:10px 14px}
+section+section{margin-top:16px}
+
+.snowfall{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
+.snowfall span{position:absolute;top:-40px;color:#fff;text-shadow:0 0 6px #4FAEEA;animation:fall 2.8s linear forwards}
+@keyframes fall{to{transform:translateY(112vh) rotate(260deg)}}
+
+@media (max-width:620px){
+  body{font-size:17px}
+  .stop:nth-child(odd){padding-right:6%}
+  .stop:nth-child(even){padding-left:6%}
+  .story{grid-template-columns:1fr}
+  .story .em{font-size:2.2rem}
+  .story p{font-size:1.35rem}
+  .frame{grid-template-columns:repeat(5,44px);gap:6px}
+  .cell{width:44px;height:44px}
+  .steps li{font-size:.85rem}
+  .barrow{grid-template-columns:70px 1fr}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+}
+/* learning hub: leave room for the 🏠 button in the top-left corner */
+.wrap{padding-top:78px}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<script src="../../shared/hub.js" data-game="snow-kingdom-stories"></script>
+<script>
+(() => {
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const app = $('#app');
+const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+const timers = new Set();
+const later = (fn, ms) => { const id = setTimeout(() => { timers.delete(id); fn(); }, ms); timers.add(id); return id; };
+
+/* ---------------- storage ---------------- */
+const KEY = 'snow-kingdom-stories-v1';
+const fresh = () => ({
+  v: 1, kidName: 'Anvesha', placementDone: false, placement: null, unlocked: 1, snowflakes: 0, levels: {},
+  mistakes: { addedAll: 0, totalSpot: 0, moreAdd: 0, label: 0, sort: 0, draw: 0 },
+  settings: { voice: true, rate: 0.92, numberless: true, unlockAll: false }, log: []
+});
+let S = fresh(); let storageOK = true;
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) {
+      const d = JSON.parse(raw); const f = fresh();
+      S = Object.assign(f, d, {
+        settings: Object.assign(f.settings, d.settings || {}),
+        mistakes: Object.assign(f.mistakes, d.mistakes || {}),
+        levels: d.levels || {}, log: d.log || []
+      });
+    }
+  } catch (e) { storageOK = false; S = fresh(); }
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); storageOK = true; } catch (e) { storageOK = false; } }
+function lv(n) { return S.levels[n] || (S.levels[n] = { rounds: 0, best: 0, mastered: false, attempts: 0, firstTry: 0, recent: [] }); }
+const unlockedMax = () => S.settings.unlockAll ? 8 : Math.max(1, Math.min(8, S.unlocked));
+const kid = () => (S.kidName || '').trim() || 'friend';
+
+/* ---------------- voice ---------------- */
+const Voice = {
+  v: null,
+  init() {
+    if (!('speechSynthesis' in window)) return;
+    const choose = () => {
+      const vs = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang));
+      const prefs = [/samantha/i, /aria/i, /jenny/i, /ava/i, /allison/i, /zira/i, /susan/i, /victoria/i, /karen/i, /moira/i, /tessa/i, /serena/i, /female/i, /google us english/i, /google uk english female/i];
+      for (const p of prefs) { const f = vs.find(v => p.test(v.name)); if (f) { this.v = f; return; } }
+      this.v = vs[0] || null;
+    };
+    choose();
+    try { speechSynthesis.addEventListener('voiceschanged', choose); } catch (e) { speechSynthesis.onvoiceschanged = choose; }
+  },
+  say(t, queue) {
+    if (!S.settings.voice || !('speechSynthesis' in window) || !t) return;
+    try {
+      if (!queue) speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(String(t).replace(/☐/g, 'mystery number').replace(/−/g, ' minus ').replace(/ \+ /g, ' plus ').replace(/ = /g, ' equals '));
+      if (this.v) u.voice = this.v;
+      u.rate = S.settings.rate; u.pitch = 1.08;
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  },
+  stop() { try { speechSynthesis.cancel(); } catch (e) {} }
+};
+
+/* ---------------- story content ---------------- */
+const PEOPLE = [['Mia','she'],['Leo','he'],['Ava','she'],['Riya','she'],['Arjun','he'],['Maya','she'],['Ravi','he'],['Zoe','she'],['Sam','he'],['Lily','she'],['Nina','she'],['Kai','he'],['Ben','he'],['Priya','she'],['Omar','he'],['Ella','she']];
+function person() { return Math.random() < 0.2 ? [kid(), 'she'] : pick(PEOPLE); }
+function twoPeople() { const a = person(); let b; do { b = pick(PEOPLE); } while (b[0] === a[0]); return [a, b]; }
+
+const PLACE = [
+  { item:'frogs', place:'on a log', join:'hopped on', leave:'hopped off', e:'🐸' },
+  { item:'ducks', place:'in the pond', join:'swam in', leave:'swam away', e:'🦆' },
+  { item:'birds', place:'on the wire', join:'landed', leave:'flew away', e:'🐦' },
+  { item:'kids', place:'on the bus', join:'got on', leave:'got off', e:'🚌' },
+  { item:'bees', place:'on the flower', join:'buzzed in', leave:'buzzed away', e:'🐝' },
+  { item:'penguins', place:'on the ice', join:'slid over', leave:'waddled away', e:'🐧' },
+  { item:'bunnies', place:'in the garden', join:'hopped in', leave:'hopped home', e:'🐰' },
+  { item:'snowflakes', place:'on the window', join:'landed', leave:'melted', e:'❄️' },
+  { item:'sleds', place:'on the hill', join:'zoomed up', leave:'slid down', e:'🛷' },
+  { item:'owls', place:'in the tree', join:'flew in', leave:'flew off', e:'🦉' }
+];
+const OWN = [
+  { item:'stickers', got:'got {n} more', get:'get', gave:'gave away {n}', give:'give away', e:'⭐' },
+  { item:'beads', got:'got {n} more', get:'get', gave:'used {n}', give:'use', e:'📿' },
+  { item:'crayons', got:'got {n} more', get:'get', gave:'gave {n} to a friend', give:'give to a friend', e:'🖍️' },
+  { item:'shells', got:'found {n} more', get:'find', gave:'lost {n}', give:'lose', e:'🐚' },
+  { item:'cards', got:'won {n} more', get:'win', gave:'traded away {n}', give:'trade away', e:'🃏' },
+  { item:'cookies', got:'baked {n} more', get:'bake', gave:'ate {n}', give:'eat', e:'🍪' }
+];
+const GROUPS = [
+  { total:'apples', a:'red apples', b:'green apples', aIs:'red', bIs:'green', place:'in the basket', e:'🍎' },
+  { total:'children', a:'boys', b:'girls', aIs:'boys', bIs:'girls', place:'in the reading group', e:'📚' },
+  { total:'birds', a:'ducks', b:'geese', aIs:'ducks', bIs:'geese', place:'at the pond', e:'🦢' },
+  { total:'animals', a:'cows', b:'horses', aIs:'cows', bIs:'horses', place:'on the farm', e:'🐄' },
+  { total:'pieces of fruit', a:'oranges', b:'bananas', aIs:'oranges', bIs:'bananas', place:'in the bowl', e:'🍊' },
+  { total:'beads', a:'big beads', b:'small beads', aIs:'big', bIs:'small', place:'in the box', e:'📿' },
+  { total:'mittens', a:'blue mittens', b:'pink mittens', aIs:'blue', bIs:'pink', place:'in the drawer', e:'🧤' },
+  { total:'fish', a:'orange fish', b:'striped fish', aIs:'orange', bIs:'striped', place:'in the tank', e:'🐠' }
+];
+const CMP = [
+  { it:'marbles', e:'🟣' }, { it:'toy cars', e:'🚗' }, { it:'stickers', e:'⭐' }, { it:'books', e:'📚' },
+  { it:'shells', e:'🐚' }, { it:'blocks', e:'🧱' }, { it:'snowballs', e:'⛄' }, { it:'crayons', e:'🖍️' }
+];
+const THREE = [
+  { t:'{N} found {a} red leaves, {b} yellow leaves, and {c} brown leaves. How many leaves did {p} find?', label:'leaves', e:'🍂' },
+  { t:'At the zoo there are {a} lions, {b} tigers, and {c} bears. How many animals are there?', label:'animals', e:'🦁' },
+  { t:'Mom baked {a} cookies, Dad baked {b}, and Grandma baked {c}. How many cookies did they bake?', label:'cookies', e:'🍪' },
+  { t:'A bus picked up {a} kids, then {b} more, then {c} more. How many kids are on the bus?', label:'kids', e:'🚌' },
+  { t:'{N} scored {a} points, then {b}, then {c}. How many points did {p} score?', label:'points', e:'🏅' },
+  { t:'There are {a} red balloons, {b} blue balloons, and {c} green balloons. How many balloons are there?', label:'balloons', e:'🎈' },
+  { t:'{N} saw {a} penguins, {b} seals, and {c} polar bears. How many animals did {p} see?', label:'animals', e:'🐧' }
+];
+const SILLY = ['elephants', 'pancakes', 'dinosaurs', 'socks', 'rainbows', 'unicorns', 'pizzas'];
+const ALL_LABELS = [...new Set([...PLACE.map(s => s.item), ...OWN.map(s => s.item), ...GROUPS.map(g => g.total), ...CMP.map(c => c.it), 'points', 'leaves', 'balloons'])];
+
+function storyFor(sc, who) {
+  if (sc.place) {
+    return {
+      item: sc.item, e: sc.e,
+      start: n => `${n} ${sc.item} were ${sc.place}`, someStart: () => `some ${sc.item} were ${sc.place}`,
+      join: n => `${n} more ${sc.join}`, someJoin: () => `some more ${sc.join}`,
+      leave: n => `${n} ${sc.leave}`, someLeave: () => `some ${sc.leave}`,
+      now: n => `now there are ${n}`, left: n => `${n} are left`,
+      qResJoin: `How many ${sc.item} are ${sc.place} now?`, qResLeave: `How many ${sc.item} are ${sc.place} now?`,
+      qChgJoin: `How many ${sc.item} ${sc.join}?`, qChgLeave: `How many ${sc.item} ${sc.leave}?`,
+      qStart: `How many ${sc.item} were ${sc.place} at first?`,
+      numberlessQ: `Will there be more ${sc.item} or fewer ${sc.item} at the end?`
+    };
+  }
+  const [N, p] = who;
+  return {
+    item: sc.item, e: sc.e,
+    start: n => `${N} had ${n} ${sc.item}`, someStart: () => `${N} had some ${sc.item}`,
+    join: n => `${p} ${sc.got.replace('{n}', n)}`, someJoin: () => `${p} ${sc.got.replace('{n}', 'some')}`,
+    leave: n => `${p} ${sc.gave.replace('{n}', n)}`, someLeave: () => `${p} ${sc.gave.replace('{n}', 'some')}`,
+    now: n => `now ${p} has ${n}`, left: n => `${p} has ${n} left`,
+    qResJoin: `How many ${sc.item} does ${N} have now?`, qResLeave: `How many ${sc.item} does ${N} have now?`,
+    qChgJoin: `How many ${sc.item} did ${p} ${sc.get}?`, qChgLeave: `How many ${sc.item} did ${p} ${sc.give}?`,
+    qStart: `How many ${sc.item} did ${N} have at first?`,
+    numberlessQ: `Will ${N} have more ${sc.item} or fewer at the end?`
+  };
+}
+const randStory = () => Math.random() < 0.55 ? storyFor(pick(PLACE)) : storyFor(pick(OWN), person());
+const tell = (...parts) => { const q = parts.pop(); return parts.map(p => cap(p) + '.').join(' ') + ' ' + q; };
+const statements = (...parts) => parts.map(p => cap(p) + '.').join(' ');
+
+function opts(ok, ...ds) {
+  const seen = new Set([ok.join(' ')]); const out = [{ t: ok, ok: true }];
+  ds.forEach(d => { const k = d.t.join(' '); if (!seen.has(k)) { seen.add(k); out.push(d); } });
+  return shuffle(out);
+}
+const E = (a, op, b, c) => [String(a), op, String(b), '=', String(c)];
+const swapSub = (a, b) => a >= b ? E(a, '−', b, '?') : E(b, '−', a, '?');
+
+/* ---------------- problem makers ---------------- */
+function mkJoinRes(st, A, B) {
+  const C = A + B;
+  return { type:'join_res', sit:'join', e:st.e, model:'circles',
+    text: tell(st.start(A), st.join(B), st.qResJoin),
+    numberless: statements(st.someStart(), st.someJoin()), numberQ: st.numberlessQ,
+    nums:[A,B], answer:C, label:st.item, total:C, partUnknown:false,
+    mtn:{ top:'?', l:A, r:B }, circ:{ start:A, change:B, dir:'join', phrase:st.join(B) },
+    eq: opts(E(A,'+',B,'?'), { t: swapSub(A,B), tag:'op' }, { t: E('?','+',A,B), tag:'box' }),
+    rb: x => `So ${st.start(A)}, ${st.join(B)}, and ${st.now(x)}?`,
+    okLine: `${A} and ${B} more make ${C}.` };
+}
+function mkLeaveRes(st, A, B) {
+  const C = A - B;
+  return { type:'leave_res', sit:'leave', e:st.e, model:'circles',
+    text: tell(st.start(A), st.leave(B), st.qResLeave),
+    numberless: statements(st.someStart(), st.someLeave()), numberQ: st.numberlessQ,
+    nums:[A,B], answer:C, label:st.item, total:A, partUnknown:true,
+    mtn:{ top:A, l:B, r:'?' }, circ:{ start:A, change:B, dir:'leave', phrase:st.leave(B) },
+    eq: opts(E(A,'−',B,'?'), { t: E(A,'+',B,'?'), tag:'addAll' }, { t: E('?','−',B,A), tag:'box' }),
+    rb: x => `So ${st.start(A)}, ${st.leave(B)}, and ${st.left(x)}?`,
+    okLine: `${A} take away ${B} leaves ${C}.` };
+}
+function mkJoinChg(st, A, B) {
+  const C = A + B;
+  return { type:'join_chg', sit:'join', e:st.e, model:'mountain',
+    text: tell(st.start(A), st.someJoin(), st.now(C), st.qChgJoin),
+    nums:[A,C], answer:B, label:st.item, total:C, partUnknown:true,
+    mtn:{ top:C, l:A, r:'?' },
+    eq: opts(E(A,'+','?',C), { t: E(A,'+',C,'?'), tag:'addAll' }, { t: E(A,'−','?',C), tag:'op' }),
+    rb: x => `So ${st.start(A)}, ${st.join(x)}, and ${st.now(C)}?`,
+    okLine: `${A} and ${B} more make ${C}.` };
+}
+function mkLeaveChg(st, A, B) {
+  const C = A - B;
+  return { type:'leave_chg', sit:'leave', e:st.e, model:'mountain',
+    text: tell(st.start(A), st.someLeave(), st.left(C), st.qChgLeave),
+    nums:[A,C], answer:B, label:st.item, total:A, partUnknown:true,
+    mtn:{ top:A, l:'?', r:C },
+    eq: opts(E(A,'−','?',C), { t: E(A,'+',C,'?'), tag:'addAll' }, { t: E(A,'+','?',C), tag:'op' }),
+    rb: x => `So ${st.start(A)}, ${st.leave(x)}, and ${st.left(C)}?`,
+    okLine: `${A} take away ${B} leaves ${C}.` };
+}
+function mkJoinStart(st, A, B) {
+  const C = A + B;
+  return { type:'join_start', sit:'join', e:st.e, model:'mountain',
+    text: tell(st.someStart(), st.join(B), st.now(C), st.qStart),
+    nums:[B,C], answer:A, label:st.item, total:C, partUnknown:true,
+    mtn:{ top:C, l:'?', r:B },
+    eq: opts(E('?','+',B,C), { t: E(B,'+',C,'?'), tag:'addAll' }, { t: E('?','−',B,C), tag:'op' }),
+    eq2: opts(E(C,'−',B,'?'), { t: E(C,'+',B,'?'), tag:'addAll' }, { t: E('?','−',C,B), tag:'box' }),
+    rb: x => `So ${st.start(x)}, ${st.join(B)}, and ${st.now(C)}?`,
+    okLine: `${A} and ${B} more make ${C}.` };
+}
+function mkLeaveStart(st, A, B) {
+  const C = A - B;
+  return { type:'leave_start', sit:'leave', e:st.e, model:'mountain',
+    text: tell(st.someStart(), st.leave(B), st.left(C), st.qStart),
+    nums:[B,C], answer:A, label:st.item, total:A, partUnknown:false,
+    mtn:{ top:'?', l:B, r:C },
+    eq: opts(E('?','−',B,C), { t: E('?','+',B,C), tag:'op' }, { t: swapSub(C,B), tag:'order' }),
+    eq2: opts(E(B,'+',C,'?'), { t: swapSub(C,B), tag:'op' }, { t: E(C,'+','?',B), tag:'box' }),
+    rb: x => `So ${st.start(x)}, ${st.leave(B)}, and ${st.left(C)}?` + (x <= C ? ` Some went away and ${C} are still here, so there must have been more than ${C} at first.` : ''),
+    okLine: `${A} take away ${B} leaves ${C}.` };
+}
+function mkPutTotal(g, A, B) {
+  const C = A + B;
+  return { type:'put_total', sit:'groups', e:g.e, model:'mountain',
+    text: `There are ${A} ${g.a} and ${B} ${g.b} ${g.place}. How many ${g.total} are there?`,
+    nums:[A,B], answer:C, label:g.total, altLabel:g.a, total:C, partUnknown:false,
+    mtn:{ top:'?', l:A, r:B },
+    eq: opts(E(A,'+',B,'?'), { t: swapSub(A,B), tag:'op' }, { t: E(A,'+','?',B), tag:'box' }),
+    rb: x => `So ${A} ${g.a} and ${B} ${g.b} make ${x} ${g.total}?`,
+    okLine: `${A} and ${B} make ${C}.` };
+}
+function mkApart(g, A, B) {
+  const C = A + B;
+  return { type:'apart', sit:'groups', e:g.e, model:'mountain',
+    text: `There are ${C} ${g.total} ${g.place}. ${A} are ${g.aIs}. The rest are ${g.bIs}. How many are ${g.bIs}?`,
+    nums:[C,A], answer:B, label:g.b, altLabel:g.a, total:C, partUnknown:true,
+    mtn:{ top:C, l:A, r:'?' },
+    eq: opts(E(A,'+','?',C), { t: E(A,'+',C,'?'), tag:'addAll' }, { t: E(C,'+','?',A), tag:'box' }),
+    rb: x => `So ${A} ${g.aIs} and ${x} ${g.bIs} would make ${A + x} ${g.total}. But there are ${C}.`,
+    okLine: `${A} and ${B} make ${C}.` };
+}
+function mkCmpDiff(c, N1, N2, B, Sm, fewer) {
+  const D = B - Sm;
+  return { type:'cmp_diff', sit:'compare', e:c.e, model:'bars',
+    text: `${N1} has ${B} ${c.it}. ${N2} has ${Sm} ${c.it}. ` + (fewer ? `How many fewer ${c.it} does ${N2} have than ${N1}?` : `How many more ${c.it} does ${N1} have than ${N2}?`),
+    nums:[B,Sm], answer:D, label:c.it, total:B, partUnknown:false,
+    bars:{ big:{ name:N1, val:B }, small:{ name:N2, val:Sm }, diff:'?' },
+    eq: opts(E(Sm,'+','?',B), { t: E(B,'+',Sm,'?'), tag:'addAll' }, { t: E(B,'+','?',Sm), tag:'box' }),
+    rb: x => `If ${N2} had ${x} more, ${N2} would have ${Sm + x}. But ${N1} has ${B}.`,
+    okLine: `${Sm} and ${D} more make ${B}, so ${fewer ? `${N2} has ${D} fewer` : `${N1} has ${D} more`}.` };
+}
+function mkCmpBig(c, N1, N2, Sm, D) {
+  const B = Sm + D;
+  return { type:'cmp_big', sit:'compare', e:c.e, model:'bars',
+    text: `${N2} has ${Sm} ${c.it}. ${N1} has ${D} more ${c.it} than ${N2}. How many ${c.it} does ${N1} have?`,
+    nums:[Sm,D], answer:B, label:c.it, total:B, partUnknown:false,
+    bars:{ big:{ name:N1, val:'?' }, small:{ name:N2, val:Sm }, diff:D },
+    eq: opts(E(Sm,'+',D,'?'), { t: swapSub(Sm,D), tag:'op' }, { t: E('?','+',D,Sm), tag:'box' }),
+    rb: x => x <= Sm ? `${N1} has more than ${N2}, so ${N1} needs more than ${Sm}.` : `Then ${N1} would have ${x - Sm} more than ${N2}, not ${D}.`,
+    okLine: `${Sm} and ${D} more make ${B}.` };
+}
+function mkCmpSmall(c, N1, p1, N2, B, D, misleading) {
+  const Sm = B - D;
+  return { type:'cmp_small', sit:'compare', e:c.e, model:'bars',
+    text: misleading
+      ? `${N1} has ${B} ${c.it}. ${cap(p1)} has ${D} more than ${N2}. How many ${c.it} does ${N2} have?`
+      : `${N1} has ${B} ${c.it}. ${N2} has ${D} fewer ${c.it} than ${N1}. How many ${c.it} does ${N2} have?`,
+    nums:[B,D], answer:Sm, label:c.it, total:B, partUnknown:false,
+    bars:{ big:{ name:N1, val:B }, small:{ name:N2, val:'?' }, diff:D },
+    eq: opts(E('?','+',D,B), { t: E(B,'+',D,'?'), tag:'moreAdd' }, { t: E('?','−',D,B), tag:'op' }),
+    rb: x => x >= B ? `${N2} has fewer than ${N1}, so ${N2}’s number has to be smaller than ${B}.` : `Then ${N1} would have ${B - x} more than ${N2}, not ${D}.`,
+    okLine: `${Sm} and ${D} more make ${B}, so ${N2} has ${Sm}.` };
+}
+function mkThree() {
+  let x, y, z;
+  if (Math.random() < 0.6) { x = rnd(2, 8); y = 10 - x; z = rnd(2, 8); }
+  else { x = rnd(2, 6); y = x; z = rnd(2, Math.min(8, 20 - 2 * x)); }
+  const nums = shuffle([x, y, z]); const T = pick(THREE); const [N, p] = person();
+  const [a, b, c] = nums;
+  const text = T.t.replace('{N}', N).replace('{p}', p).replace('{a}', a).replace('{b}', b).replace('{c}', c);
+  const sum = a + b + c;
+  return { type:'three', sit:'three', e:T.e, model:'three', text, nums, answer:sum, label:T.label, total:sum, partUnknown:false,
+    rb: () => `Let’s check: ${a} + ${b} + ${c}. Add your 10 pair first, then the last number.`, noSense:true,
+    okLine: `${x} + ${y} = ${x + y}, then ${x + y} + ${z} = ${sum}.` };
+}
+function mkTwoStep() {
+  if (Math.random() < 0.5) {
+    const st = storyFor(pick(OWN), person());
+    const A = rnd(4, 10), B = rnd(2, Math.min(8, 18 - A)), R1 = A + B, C = rnd(2, R1 - 2), R2 = R1 - C;
+    return { type:'two_step', sit:'two', e:st.e, model:'two',
+      text: tell(st.start(A), st.join(B), 'then ' + st.leave(C), st.qResJoin),
+      nums:[A,B,C], answer:R2, label:st.item, partUnknown:false,
+      steps:[ { eq: opts(E(A,'+',B,'?'), { t:E(A,'−',B,'?'), tag:'op' }, { t:E(A,'+',C,'?'), tag:'order' }), ans:R1 },
+              { eq: opts(E(R1,'−',C,'?'), { t:E(R1,'+',C,'?'), tag:'op' }, { t:swapSub(A,C), tag:'order' }), ans:R2 } ],
+      okLine: `${A} + ${B} = ${R1}, then ${R1} − ${C} = ${R2}.` };
+  }
+  const st = storyFor(pick(PLACE));
+  const A = rnd(8, 18), B = rnd(2, A - 3), R1 = A - B, C = rnd(2, Math.min(9, 20 - R1)), R2 = R1 + C;
+  return { type:'two_step', sit:'two', e:st.e, model:'two',
+    text: tell(st.start(A), st.leave(B), 'then ' + st.join(C), st.qResJoin),
+    nums:[A,B,C], answer:R2, label:st.item, partUnknown:false,
+    steps:[ { eq: opts(E(A,'−',B,'?'), { t:E(A,'+',B,'?'), tag:'op' }, { t:E(A,'+',C,'?'), tag:'order' }), ans:R1 },
+            { eq: opts(E(R1,'+',C,'?'), { t:swapSub(R1,C), tag:'op' }, { t:E(A,'+',C,'?'), tag:'order' }), ans:R2 } ],
+    okLine: `${A} − ${B} = ${R1}, then ${R1} + ${C} = ${R2}.` };
+}
+function mkTwoDigit() {
+  const k = rnd(1, 5); let p;
+  if (k === 1) { const ones = rnd(1, 5); const A = rnd(2, 8) * 10 + ones; p = mkPutTotal(pick(GROUPS), A, rnd(2, 9 - ones)); }
+  else if (k === 2) { const A = rnd(2, 6) * 10 + rnd(1, 9); p = mkPutTotal(pick(GROUPS), A, rnd(1, 9 - Math.floor(A / 10)) * 10); }
+  else if (k === 3) {
+    const a1 = rnd(1, 5), a0 = rnd(5, 9), b1 = rnd(1, 8 - a1), b0 = rnd(10 - a0, 9);
+    const A = a1 * 10 + a0, B = b1 * 10 + b0;
+    p = Math.random() < 0.5 ? mkPutTotal(pick(GROUPS), A, B) : mkJoinRes(storyFor(pick(PLACE.filter(s => s.item !== 'snowflakes'))), A, B);
+    p.newTen = true;
+  }
+  else if (k === 4) { const A = rnd(5, 9) * 10; p = mkLeaveRes(randStory(), A, rnd(1, A / 10 - 1) * 10); }
+  else { const C = rnd(5, 9) * 10; const A = rnd(2, C / 10 - 1) * 10; p = mkJoinChg(randStory(), A, C - A); }
+  p.model = 'mountain'; p.big2 = true;
+  return p;
+}
+function split(lo, hi) { const C = rnd(lo, hi); const a = rnd(2, C - 2); return [a, C - a, C]; }
+function gen(type, max) {
+  switch (type) {
+    case 'join_res': { const [a, b] = split(4, max); return mkJoinRes(randStory(), a, b); }
+    case 'leave_res': { const [, b, A] = split(4, max); return mkLeaveRes(randStory(), A, b); }
+    case 'join_chg': { const [a, b] = split(5, max); return mkJoinChg(randStory(), a, b); }
+    case 'leave_chg': { const [, b, A] = split(5, max); return mkLeaveChg(randStory(), A, b); }
+    case 'join_start': { const [a, b] = split(5, max); return mkJoinStart(randStory(), a, b); }
+    case 'leave_start': { const [, b, A] = split(5, max); return mkLeaveStart(randStory(), A, b); }
+    case 'put_total': { const [a, b] = split(5, max); return mkPutTotal(pick(GROUPS), a, b); }
+    case 'apart': { const [a, b] = split(5, max); return mkApart(pick(GROUPS), a, b); }
+    case 'cmp_diff': { const [[N1], [N2]] = twoPeople(); const B = rnd(5, max), s = rnd(2, B - 2); return mkCmpDiff(pick(CMP), N1, N2, B, s, Math.random() < 0.35); }
+    case 'cmp_big': { const [[N1], [N2]] = twoPeople(); const s = rnd(2, max - 3), d = rnd(2, Math.min(9, max - s)); return mkCmpBig(pick(CMP), N1, N2, s, d); }
+    case 'cmp_small': { const [[N1, p1], [N2]] = twoPeople(); const B = rnd(6, max), d = rnd(2, B - 2); return mkCmpSmall(pick(CMP), N1, p1, N2, B, d, Math.random() < 0.65); }
+    case 'three': return mkThree();
+    case 'two_digit': return mkTwoDigit();
+    case 'two_step': return mkTwoStep();
+  }
+  throw new Error('Unknown type ' + type);
+}
+
+/* ---------------- trails (the 8 weeks) ---------------- */
+const LEVELS = [
+  { n:1, title:'What’s happening?', sub:'Something joins or leaves', skill:'Add To / Take From, result unknown', types:['join_res','leave_res'], max:10,
+    idea:'Every word problem is a little story. Picture it in your head: did something join, or did something leave?',
+    example:'3 ducks swim in the pond. 2 more fly in. The ducks got more! 3 and 2 more make 5.' },
+  { n:2, title:'Math Mountain', sub:'Two groups make a total', skill:'Put Together, Math Mountain', types:['put_total'], max:20,
+    idea:'When two groups are just there together, nothing moves. The two partners make the total, and the total sits on top of the Math Mountain.',
+    example:'8 red blocks and 5 blue blocks. 13 goes on top. 8 and 5 are the partners.', demo:{ top:13, l:8, r:5 } },
+  { n:3, title:'The hidden partner', sub:'Find the missing part', skill:'Hidden partner (change / addend unknown)', types:['join_chg','leave_chg','apart'], max:20,
+    idea:'Now the total is in the story and a partner is hiding. Ask yourself: do I know the total? If yes, it goes on top, and the mystery is a partner.',
+    example:'Mia had 5 shells. She found some more. Now she has 8. Do I know the total? Yes, 8! So 8 goes on top, 5 is one partner, and the mystery is the other. 5 + ☐ = 8. Count on: 6, 7, 8. She found 3.', demo:{ top:8, l:5, r:'?' } },
+  { n:4, title:'Mystery at the start', sub:'Some were there at first', skill:'Start unknown, two equations', types:['join_start','leave_start'], max:20,
+    idea:'Some stories start with “some.” The start is the mystery! Find the total, put it on top, and the start is a partner.',
+    example:'Some kids were on the bus. 3 more got on. Now there are 10. 10 goes on top. The start and 3 are partners: ☐ + 3 = 10. To solve it: 10 − 3 = ☐.', demo:{ top:10, l:'?', r:3 } },
+  { n:5, title:'Who has more?', sub:'Compare with bars', skill:'Compare with comparison bars', types:['cmp_diff','cmp_big','cmp_small'], max:20,
+    idea:'Compare stories have no action. Two amounts sit side by side. The longer bar is whoever has more, and the extra piece is how many more. Careful: “more” doesn’t always mean add!',
+    example:'Leo has 8 cars. Ava has 5. Leo’s bar is longer. The extra piece is 3, so Leo has 3 more.', bars:{ big:{ name:'Leo', val:8 }, small:{ name:'Ava', val:5 }, diff:3 } },
+  { n:6, title:'Three numbers', sub:'Hunt for a 10', skill:'Three addends', types:['three'], max:20,
+    idea:'You can add three numbers in any order. Hunt for two numbers that make 10, or a double, and add those first.',
+    example:'7 + 4 + 3. I see 7 and 3 make 10! Then 10 + 4 = 14.' },
+  { n:7, title:'Bigger numbers', sub:'Tens and ones', skill:'Two-digit stories', types:['two_digit'], max:99,
+    idea:'Bigger numbers, same stories! Tens are sticks and ones are dots. Your Math Mountain works exactly the same way.',
+    example:'26 boys and 14 girls. It’s the same mountain as 6 boys and 4 girls, just with bigger numbers.', sticks:[26, 14] },
+  { n:8, title:'Mix it up', sub:'Every kind, plus two steps', skill:'Mixed, two-step, assessment', types:['mix'], max:20,
+    idea:'Every kind of story, all mixed up. Some stories have two things happening. Go one step at a time.',
+    example:'{K} had 8 cookies. She baked 6 more. Then she gave 4 to her brother. First 8 + 6 = 14. Then 14 − 4 = 10.' }
+];
+const SIT_LABEL = { join:'Something joined', leave:'Something left', groups:'Two groups together', compare:'Comparing two amounts' };
+const SIT_YES = { join:'Yes! Something joined, so there will be more.', leave:'Yes! Something left, so there will be fewer.', groups:'Yes! Two groups are just there together. Nothing moves.', compare:'Yes! We’re comparing two amounts to see who has more.' };
+const SIT_WHY = { join:'More things came in.', leave:'Some things went away.', groups:'Nothing moved. Two kinds of things are just there together.', compare:'Nothing moves. We want to know who has more.' };
+const STEP_GROUP = { numberless:0, sort:0, retell:0, draw:1, three:1, write:2, write2:2, two:2, solve:3, label:3, check:3 };
+
+const PLACEMENT = [
+  { t:'Sam has 4 crayons. He gets 3 more. How many crayons now?', a:7, e:'🖍️' },
+  { t:'There are 8 cookies. Dad eats 2. How many are left?', a:6, e:'🍪' },
+  { t:'5 cats and 4 dogs are at the park. How many animals?', a:9, e:'🐈' },
+  { t:'Riya had 6 stickers. Her friend gave her some. Now she has 10. How many did her friend give?', a:4, e:'⭐' },
+  { t:'There are 9 balloons. 5 are red, the rest are blue. How many blue?', a:4, e:'🎈' },
+  { t:'Some kids are on the bus. 3 more get on. Now there are 10. How many were on the bus at first?', a:7, e:'🚌' },
+  { t:'Arjun has 9 marbles. Lily has 6. How many more marbles does Arjun have?', a:3, e:'🟣' },
+  { t:'Nina read 4 books, then 3 books, then 5 books. How many books?', a:12, e:'📚' }
+];
+
+/* ---------------- shared bits ---------------- */
+let keyHandler = null;
+document.addEventListener('keydown', e => {
+  if (!keyHandler) return;
+  const t = e.target;
+  if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+  if ((e.key === 'Enter' || e.key === ' ') && t && t.tagName === 'BUTTON') return;
+  keyHandler(e);
+});
+function screen(html) { timers.forEach(clearTimeout); timers.clear(); keyHandler = null; app.innerHTML = html; try { window.scrollTo(0, 0); } catch (e) {} }
+const highlight = t => esc(t).replace(/\d+/g, m => `<b class="n">${m}</b>`);
+const valHTML = v => String(v) === '?' ? '<span class="box" aria-label="mystery number"></span>' : esc(v);
+const eqHTML = t => '<span class="eq">' + t.map(x => x === '?' ? '<span class="box" aria-label="mystery number"></span>' : `<span>${esc(x)}</span>`).join('') + '</span>';
+const eqSay = t => t.map(x => x === '?' ? 'mystery number' : x === '−' ? 'minus' : x === '+' ? 'plus' : x === '=' ? 'equals' : x).join(' ');
+const sayVal = v => String(v) === '?' ? 'the mystery number' : String(v);
+const starsFor = best => best >= 5 ? 3 : best >= 4 ? 2 : best >= 3 ? 1 : 0;
+const starStr = n => '★'.repeat(n) + '☆'.repeat(3 - n);
+
+function mountainHTML(interactive, vals, small) {
+  const tag = interactive ? 'button' : 'div';
+  return `<div class="mtn ${small ? 'sm' : ''}"><svg viewBox="0 0 360 230" aria-hidden="true">
+    <polygon points="180,8 352,226 8,226" fill="var(--rock)" stroke="var(--rock-2)" stroke-width="3" stroke-linejoin="round"/>
+    <polygon points="180,8 352,226 180,226" fill="var(--rock-2)" opacity=".5"/>
+    <polygon points="180,8 240,84 220,76 202,92 182,74 162,94 144,78 122,84" fill="var(--snow)" stroke="var(--rock-2)" stroke-width="2.5" stroke-linejoin="round"/>
+  </svg>${['top','l','r'].map(k => `<${tag} class="slot s-${k} ${vals ? 'filled' : ''}" data-k="${k}" aria-label="${k === 'top' ? 'Total spot' : 'Partner spot'}">${vals ? valHTML(vals[k]) : ''}</${tag}>`).join('')}</div>`;
+}
+function barsHTML(b, interactive, small) {
+  const tag = interactive ? 'button' : 'div';
+  const s = k => `<${tag} class="slot ${interactive ? '' : 'filled'}" data-k="${k}" aria-label="${k === 'diff' ? 'Extra piece' : 'Bar'} spot">${interactive ? '' : valHTML(k === 'diff' ? b.diff : b[k].val)}</${tag}>`;
+  return `<div class="bars ${small ? 'sm' : ''}">
+    <div class="barrow"><span class="who">${esc(b.big.name)}</span><div class="bar"><div class="seg" style="flex:1">${s('big')}</div></div></div>
+    <div class="barrow"><span class="who">${esc(b.small.name)}</span><div class="bar"><div class="seg" style="flex:62">${s('small')}</div><div class="seg extra" style="flex:38">${s('diff')}</div></div></div>
+    <div class="extra-note">the extra piece shows how many more</div></div>`;
+}
+function sticksHTML(nums) {
+  return `<div class="sdwrap" aria-label="Sticks and dots">${nums.map(n => `<span class="sd">${'<span class="stick"></span>'.repeat(Math.floor(n / 10))}${'<span class="dot"></span>'.repeat(n % 10)}<b>${n}</b></span>`).join('')}</div>`;
+}
+function framesHTML(cells, cnt, joined, crossed, interactive) {
+  const tag = interactive ? 'button' : 'span';
+  let h = '';
+  for (let f = 0; f < cells / 10; f++) {
+    h += '<div class="frame">';
+    for (let i = f * 10; i < f * 10 + 10; i++) {
+      const cls = i < cnt ? 's' : i < cnt + joined ? 'j' : '';
+      h += `<${tag} class="cell ${cls} ${crossed.has(i) ? 'x' : ''}" data-i="${i}" ${interactive ? `aria-label="Spot ${i + 1}"` : ''}></${tag}>`;
+    }
+    h += '</div>';
+  }
+  return h;
+}
+function snowfall() {
+  if (reduced) return;
+  const box = document.createElement('div'); box.className = 'snowfall'; box.setAttribute('aria-hidden', 'true');
+  for (let i = 0; i < 38; i++) {
+    const s = document.createElement('span'); s.textContent = '❄';
+    s.style.left = Math.random() * 100 + '%'; s.style.animationDelay = (Math.random() * 0.9) + 's';
+    s.style.fontSize = (14 + Math.random() * 24) + 'px'; box.appendChild(s);
+  }
+  document.body.appendChild(box); setTimeout(() => box.remove(), 4000);
+}
+function pad(el, onSubmit) {
+  let v = '';
+  el.innerHTML = `<div class="padshow" aria-live="polite"><span class="padval">?</span></div><div class="pad">${[1,2,3,4,5,6,7,8,9].map(d => `<button data-d="${d}">${d}</button>`).join('')}<button data-d="back" aria-label="Delete">⌫</button><button data-d="0">0</button><button data-d="ok" class="go">Check</button></div>`;
+  const show = () => { el.querySelector('.padval').textContent = v || '?'; };
+  const api = { clear() { v = ''; show(); }, disable() { $$('button', el).forEach(b => b.disabled = true); keyHandler = null; } };
+  const press = d => {
+    if (d === 'back') v = v.slice(0, -1);
+    else if (d === 'ok') { if (v !== '') onSubmit(parseInt(v, 10), api); return; }
+    else if (v.length < 2) v = (v === '0' ? '' : v) + d;
+    show();
+  };
+  $$('.pad button', el).forEach(b => b.onclick = () => { b.blur(); press(b.dataset.d); });
+  keyHandler = e => {
+    if (/^[0-9]$/.test(e.key)) { e.preventDefault(); press(e.key); }
+    else if (e.key === 'Backspace') { e.preventDefault(); press('back'); }
+    else if (e.key === 'Enter') { e.preventDefault(); press('ok'); }
+  };
+  return api;
+}
+// Tap a tile, then tap a spot. judge(got) -> {ok:true} | {msg, solution}
+function slotGame(root, values, keys, judge, onDone) {
+  const tiles = shuffle(values.map(String)).map((v, i) => ({ i, v }));
+  const slots = {}; keys.forEach(k => slots[k] = null);
+  let sel = null, wrongs = 0, finished = false;
+  const tray = $('#tray', root), chk = $('#chk', root), hint = $('#hint', root);
+  const slotEl = k => root.querySelector(`.slot[data-k="${k}"]`);
+  function paint() {
+    const used = Object.values(slots);
+    tray.innerHTML = tiles.map(t => { const u = used.includes(t.i); return `<button class="tile ${sel === t.i ? 'sel' : ''} ${u ? 'used' : ''}" data-i="${t.i}" ${u || finished ? 'disabled' : ''} aria-label="${t.v === '?' ? 'mystery number' : t.v}" aria-pressed="${sel === t.i}">${valHTML(t.v)}</button>`; }).join('');
+    keys.forEach(k => { const el = slotEl(k); el.innerHTML = slots[k] == null ? '' : valHTML(tiles[slots[k]].v); el.classList.toggle('filled', slots[k] != null); });
+    chk.disabled = finished || keys.some(k => slots[k] == null);
+    $$('.tile', tray).forEach(b => b.onclick = () => { sel = sel === +b.dataset.i ? null : +b.dataset.i; paint(); });
+  }
+  keys.forEach(k => {
+    slotEl(k).onclick = () => {
+      if (finished) return;
+      if (slots[k] != null) { slots[k] = null; paint(); return; }
+      if (sel == null) { hint.textContent = 'Tap a number first, then tap this spot.'; return; }
+      slots[k] = sel; sel = null; hint.textContent = ''; paint();
+    };
+  });
+  chk.onclick = () => {
+    const got = {}; keys.forEach(k => got[k] = tiles[slots[k]].v);
+    const res = judge(got);
+    if (res.ok) {
+      finished = true; keys.forEach(k => slotEl(k).classList.add('right')); paint(); onDone(false); return;
+    }
+    wrongs++;
+    if (wrongs >= 2) {
+      const free = tiles.map(t => t.i);
+      keys.forEach(k => { const idx = free.findIndex(i => tiles[i].v === String(res.solution[k])); slots[k] = free.splice(idx, 1)[0]; });
+      finished = true; paint(); keys.forEach(k => slotEl(k).classList.add('right'));
+      const m = res.msg + ' Here’s how it goes.'; hint.textContent = m; Voice.say(m); onDone(true);
+    } else {
+      keys.forEach(k => slots[k] = null); sel = null; paint(); hint.textContent = res.msg; Voice.say(res.msg);
+    }
+  };
+  paint();
+}
+function markChoices(w) { $$('.choice', w).forEach(b => b.disabled = true); }
+
+/* ---------------- home ---------------- */
+function home() {
+  Voice.stop();
+  const max = unlockedMax();
+  let next = 0;
+  for (let n = 1; n <= max; n++) { if (!lv(n).mastered) { next = n; break; } }
+  screen(`<div class="wrap">
+    <header class="top"><div><h1>Snow Kingdom Stories</h1><p class="hi">Hi ${esc(kid())}! Every word problem is a little story.</p></div><div class="flakes" aria-label="Snowflakes">❄ ${S.snowflakes}</div></header>
+    ${storageOK ? '' : '<p class="warn">This browser isn’t saving progress. Ask a grown-up to check the browser settings.</p>'}
+    ${!S.placementDone ? `<section class="card callout"><p class="prompt">New here?</p><p>A quick check with 8 short stories finds the best trail to start on.</p><div class="row"><button class="btn pop" id="place">Find my starting trail</button><button class="btn ghost" id="skipPlace">Start at trail 1</button></div></section>` : ''}
+    <ol class="trail">${LEVELS.map(L => {
+      const d = lv(L.n); const locked = L.n > max;
+      const cls = locked ? 'locked' : d.mastered ? 'done' : L.n === next ? 'next' : '';
+      return `<li class="stop ${cls}"><button data-l="${L.n}" ${locked ? 'disabled aria-disabled="true"' : ''} aria-label="Trail ${L.n}: ${esc(L.title)}${locked ? ', locked' : ''}">
+        <span class="disc">${locked ? '🔒' : L.n}</span><span class="t"><b>${esc(L.title)}</b><small>${esc(L.sub)}</small></span>
+        <span class="stars" aria-label="${starsFor(d.best)} of 3 stars">${d.rounds ? starStr(starsFor(d.best)) : ''}</span></button></li>`;
+    }).join('')}</ol>
+    <footer class="foot">
+      <ol class="routine" aria-label="The routine for every story"><li><span>1</span>Read it</li><li><span>2</span>Draw it</li><li><span>3</span>Write it</li><li><span>4</span>Check it</li></ol>
+      <button class="grown" id="grown">Grown-ups: press and hold</button>
+    </footer></div>`);
+  $$('.stop button').forEach(b => b.onclick = () => { if (!b.disabled) startRound(+b.dataset.l); });
+  if ($('#place')) $('#place').onclick = placement;
+  if ($('#skipPlace')) $('#skipPlace').onclick = () => { S.placementDone = true; save(); home(); };
+  const g = $('#grown'); let t = null;
+  const start = e => { if (e) e.preventDefault(); if (t) return; g.classList.add('holding'); g.textContent = 'Keep holding…'; t = setTimeout(() => { t = null; parent(); }, 2000); };
+  const end = () => { if (t) { clearTimeout(t); t = null; } g.classList.remove('holding'); g.textContent = 'Grown-ups: press and hold'; };
+  g.addEventListener('pointerdown', start);
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => g.addEventListener(ev, end));
+  g.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) start(e); });
+  g.addEventListener('keyup', end);
+  g.addEventListener('contextmenu', e => e.preventDefault());
+}
+
+/* ---------------- placement check ---------------- */
+function placement() {
+  let i = 0; const res = [];
+  const show = () => {
+    if (i >= PLACEMENT.length) return finish();
+    const q = PLACEMENT[i];
+    screen(`<div class="wrap">
+      <div class="bar"><button class="btn ghost sm" id="quit">Back to trail</button><div class="dots">${PLACEMENT.map((_, k) => `<span class="d5 ${k < i ? 'ok' : ''} ${k === i ? 'cur' : ''}"></span>`).join('')}</div><span></span></div>
+      <p class="lead">Just try your best. You can use toys or draw on paper too!</p>
+      <section class="story"><div class="em" aria-hidden="true">${q.e}</div><div><p>${highlight(q.t)}</p><button class="btn ghost sm" id="hear">🔊 Read it to me</button></div></section>
+      <section class="work"><p class="prompt">What’s the answer?</p><div id="pad"></div><div class="row center" style="margin-top:14px"><button class="btn ghost sm" id="skip">I’m not sure</button></div></section></div>`);
+    $('#quit').onclick = home; $('#hear').onclick = () => Voice.say(q.t);
+    Voice.say(q.t);
+    pad($('#pad'), x => { res.push(x === q.a); i++; show(); });
+    $('#skip').onclick = () => { res.push(false); i++; show(); };
+  };
+  const finish = () => {
+    const ok = k => res[k];
+    let unlock = 1, startAt = 1, msg;
+    if ([0,1,2,3,4].every(ok)) { unlock = 3; startAt = 3; msg = 'You already know a lot of story types! Start on trail 3. Trails 1 and 2 are open for a quick warm-up.'; }
+    else if ([0,1,2].every(ok)) { unlock = 2; startAt = 1; msg = 'Great start! Begin with trail 1. Trail 2 is open too.'; }
+    else { msg = 'Let’s start at the very beginning, with trail 1.'; }
+    S.unlocked = Math.max(S.unlocked, unlock); S.placementDone = true;
+    S.placement = { date: new Date().toISOString().slice(0, 10), res, startAt }; save();
+    screen(`<div class="wrap"><section class="card result"><p class="big">❄</p><h2>All done!</h2><p class="intro idea" style="margin:0 auto 18px">${msg}</p>
+      <div class="row center"><button class="btn pop big" id="go">Go to trail ${startAt}</button><button class="btn ghost" id="home">See the trail map</button></div></section></div>`);
+    Voice.say('All done! ' + msg);
+    $('#go').onclick = () => startRound(startAt); $('#home').onclick = home;
+  };
+  show();
+}
+
+/* ---------------- a round of stories ---------------- */
+let P = null;
+function buildRound(level) {
+  const L = LEVELS[level - 1];
+  if (level === 8) {
+    const pool = shuffle(['join_chg','leave_chg','apart','join_start','leave_start','cmp_diff','cmp_big','cmp_small','three','two_digit','put_total','leave_res','join_res']);
+    const arr = pool.slice(0, 4).map(t => gen(t, 20));
+    arr.splice(rnd(2, 4), 0, gen('two_step', 20));
+    return arr;
+  }
+  const types = shuffle(L.types); const cur = [];
+  for (let i = 0; i < 4; i++) cur.push(gen(types[i % types.length], L.max));
+  const list = shuffle(cur);
+  if (level > 1) { const R = LEVELS[rnd(1, level - 1) - 1]; const r = gen(pick(R.types), R.max); r.review = true; list.splice(2, 0, r); }
+  else list.push(gen(pick(L.types), L.max));
+  return list;
+}
+function startRound(level) { Voice.stop(); P = { level, list: buildRound(level), idx: 0, results: [] }; intro(level); }
+
+function intro(level) {
+  const L = LEVELS[level - 1];
+  const example = (L.example || '').replace('{K}', kid());
+  screen(`<div class="wrap">
+    <div class="bar"><button class="btn ghost sm" id="back">Back to trail</button><div class="flakes">❄ ${S.snowflakes}</div></div>
+    <section class="card intro"><h2>Trail ${level}: ${esc(L.title)}</h2>
+      <p class="idea">${esc(L.idea)}</p>
+      ${example ? `<div class="ex">${esc(example).replace(/☐/g, '<span class="box"></span>')}</div>` : ''}
+      ${L.demo ? mountainHTML(false, L.demo) : ''}
+      ${L.bars ? barsHTML(L.bars, false) : ''}
+      ${L.sticks ? sticksHTML(L.sticks) : ''}
+      <div class="row center" style="margin-top:16px"><button class="btn ghost" id="hear">🔊 Hear it</button><button class="btn pop big" id="go">Start the stories</button></div>
+    </section></div>`);
+  $('#back').onclick = home;
+  $('#hear').onclick = () => Voice.say(L.idea + ' ' + example);
+  $('#go').onclick = () => { Voice.stop(); nextProblem(); };
+  Voice.say(L.idea + ' For example: ' + example);
+}
+function flowFor(p) {
+  if (p.model === 'three') return ['retell', 'three', 'solve', 'label', 'check'];
+  if (p.model === 'two') return ['retell', 'two', 'label', 'check'];
+  const f = [P.level === 1 && S.settings.numberless && p.numberless && !p.review ? 'numberless' : 'sort', 'draw', 'write'];
+  if (p.eq2) f.push('write2');
+  f.push('solve', 'label', 'check');
+  return f;
+}
+function nextProblem() {
+  if (P.idx >= P.list.length) return roundEnd();
+  const p = P.list[P.idx];
+  P.p = p; P.flow = flowFor(p); P.step = 0; P.firstTry = true; P.revealed = P.flow[0] !== 'numberless';
+  const dots = P.list.map((_, i) => `<span class="d5 ${i < P.results.length ? (P.results[i] ? 'ok' : 'miss') : ''} ${i === P.idx ? 'cur' : ''}"></span>`).join('');
+  screen(`<div class="wrap play">
+    <div class="bar"><button class="btn ghost sm" id="quit">Back to trail</button>
+      <div class="dots" role="img" aria-label="Story ${P.idx + 1} of ${P.list.length}">${dots}</div>
+      <div class="flakes">❄ <span id="fl">${S.snowflakes}</span></div></div>
+    <ol class="steps">${['Read it', 'Draw it', 'Write it', 'Check it'].map((s, i) => `<li data-g="${i}">${s}</li>`).join('')}</ol>
+    <section class="story"><div class="em" aria-hidden="true">${p.e || '❄️'}</div><div><p id="storyText"></p><button class="btn ghost sm" id="hear">🔊 Read it to me</button></div></section>
+    <section class="work" id="work" aria-live="polite"></section></div>`);
+  $('#quit').onclick = home;
+  $('#hear').onclick = () => Voice.say(storyNow());
+  setStory();
+  Voice.say(storyNow());
+  runStep();
+}
+const storyNow = () => P.revealed ? P.p.text : P.p.numberless + ' ' + P.p.numberQ;
+function setStory() { $('#storyText').innerHTML = P.revealed ? highlight(P.p.text) : esc(P.p.numberless); }
+function runStep() {
+  const s = P.flow[P.step]; const g = STEP_GROUP[s];
+  $$('.steps li').forEach(li => { const i = +li.dataset.g; li.className = i < g ? 'done' : i === g ? 'on' : ''; });
+  keyHandler = null;
+  STEPS[s]();
+}
+function advance() { P.step++; runStep(); }
+
+const STEPS = {
+  numberless() {
+    const p = P.p, w = $('#work');
+    const right = p.sit === 'join' ? 'more' : 'fewer';
+    w.innerHTML = `<p class="prompt">${esc(p.numberQ)}</p><p class="sub">No numbers yet. Just picture what’s happening.</p>
+      <div class="choices two"><button class="choice" data-v="more">More</button><button class="choice" data-v="fewer">Fewer</button></div><p class="hint" id="hint"></p>`;
+    let tries = 0;
+    $$('.choice', w).forEach(b => b.onclick = () => {
+      if (b.dataset.v === right) {
+        b.classList.add('right'); markChoices(w);
+        P.revealed = true; setStory();
+        Voice.say((right === 'more' ? 'Yes! Some more came, so there will be more.' : 'Yes! Some went away, so there will be fewer.') + ' Here are the numbers. ' + p.text);
+        later(advance, 1200);
+      } else {
+        tries++; b.classList.add('wrong'); b.disabled = true; S.mistakes.sort++; save();
+        const h = 'Picture it. Did some come, or did some go?';
+        $('#hint').textContent = h; Voice.say(h + ' ' + p.numberless);
+      }
+    });
+  },
+  sort() {
+    const p = P.p, w = $('#work');
+    const sits = ['join', 'leave']; if (P.level >= 2) sits.push('groups'); if (P.level >= 5) sits.push('compare');
+    w.innerHTML = `<p class="prompt">What’s happening in the story?</p><div class="choices">${sits.map(s => `<button class="choice" data-v="${s}">${SIT_LABEL[s]}</button>`).join('')}</div><p class="hint" id="hint"></p>`;
+    Voice.say('What’s happening in the story?', true);
+    let tries = 0;
+    $$('.choice', w).forEach(b => b.onclick = () => {
+      if (b.dataset.v === p.sit) { b.classList.add('right'); markChoices(w); Voice.say(SIT_YES[p.sit]); later(advance, 1300); return; }
+      tries++; S.mistakes.sort++; save(); b.classList.add('wrong'); b.disabled = true;
+      let h = 'Picture it in your head. Does something come or go? Or are two groups just there together?' + (P.level >= 5 ? ' Or are we comparing who has more?' : '');
+      if (tries >= 2) {
+        h = `This one is “${SIT_LABEL[p.sit]}.” ${SIT_WHY[p.sit]}`;
+        w.querySelector(`[data-v="${p.sit}"]`).classList.add('right'); markChoices(w); later(advance, 3200);
+      }
+      $('#hint').textContent = h; Voice.say(h);
+    });
+  },
+  retell() {
+    const w = $('#work');
+    w.innerHTML = `<p class="prompt">Tell the story in your own words, without the numbers.</p><p class="sub">Who is in the story? What happens?</p><button class="btn big" id="ok">I told the story</button>`;
+    Voice.say('Tell the story in your own words, without the numbers.', true);
+    $('#ok').onclick = advance;
+  },
+  draw() { ({ circles: drawCircles, mountain: drawMountain, bars: drawBars })[P.p.model](); },
+  three() {
+    const p = P.p, w = $('#work');
+    let picked = [], wrongs = 0, done = false;
+    w.innerHTML = `<p class="prompt">Hunt for a 10!</p><p class="sub">Tap two numbers that make 10, or two numbers that are the same.</p>
+      <div class="tray" id="tray">${p.nums.map((n, i) => `<button class="tile" data-i="${i}" aria-pressed="false">${n}</button>`).join('')}</div>
+      <p class="eqline" id="eql"></p><p class="hint" id="hint"></p>`;
+    Voice.say('Hunt for a 10! Tap two numbers that make 10, or two numbers that are the same.');
+    const good = (i, j) => p.nums[i] + p.nums[j] === 10 || p.nums[i] === p.nums[j];
+    const finish = (i, j) => {
+      done = true; const x = p.nums[i], y = p.nums[j]; const k = [0, 1, 2].find(q => q !== i && q !== j); const z = p.nums[k];
+      $$('.tile', w).forEach((b, q) => { b.disabled = true; if (q === i || q === j) b.classList.add('picked'); });
+      $('#eql').innerHTML = `${eqHTML(E(x, '+', y, x + y))}<br>${eqHTML(E(x + y, '+', z, '?'))}`;
+      p.solveEq = E(x + y, '+', z, '?');
+      p.okLine = `${x} + ${y} = ${x + y}, then ${x + y} + ${z} = ${p.answer}.`;
+      Voice.say(`${x} plus ${y} is ${x + y}. Now add ${z}.`);
+      later(advance, 2200);
+    };
+    $$('.tile', w).forEach(b => b.onclick = () => {
+      if (done) return;
+      const i = +b.dataset.i;
+      if (picked.includes(i)) { picked = picked.filter(q => q !== i); b.classList.remove('sel'); b.setAttribute('aria-pressed', 'false'); return; }
+      picked.push(i); b.classList.add('sel'); b.setAttribute('aria-pressed', 'true');
+      if (picked.length < 2) return;
+      const [a, c] = picked;
+      if (good(a, c)) { $('#hint').textContent = ''; return finish(a, c); }
+      wrongs++;
+      const h = `${p.nums[a]} + ${p.nums[c]} = ${p.nums[a] + p.nums[c]}. That’s not 10, and they’re not the same. Try another pair.`;
+      picked = []; $$('.tile', w).forEach(t => { t.classList.remove('sel'); t.setAttribute('aria-pressed', 'false'); });
+      if (wrongs >= 2) {
+        const pairs = [[0, 1], [0, 2], [1, 2]].find(([q, r]) => good(q, r));
+        $('#hint').textContent = 'Look! These two work.'; Voice.say('Look! These two work.'); finish(pairs[0], pairs[1]);
+      } else { $('#hint').textContent = h; Voice.say(h); }
+    });
+  },
+  write() { writeStep(1); },
+  write2() { writeStep(2); },
+  two() {
+    const p = P.p, w = $('#work'); let k = 0;
+    const msgs = { op: 'Check the action. Did things come or go in this part?', order: '' };
+    const stepUI = () => {
+      const s = p.steps[k];
+      w.innerHTML = `<p class="prompt">${k === 0 ? 'What happens first?' : 'What happens next?'}</p>
+        ${k === 1 ? `<p class="sub">First part: ${eqHTML(p.steps[0].done)}</p>` : '<p class="sub">Go one step at a time.</p>'}
+        <div class="choices eqs" id="ch">${s.eq.map((o, i) => `<button class="choice" data-i="${i}">${eqHTML(o.t)}</button>`).join('')}</div>
+        <div id="pad"></div><p class="hint" id="hint"></p>`;
+      Voice.say(k === 0 ? 'What happens first?' : 'What happens next?');
+      let tries = 0;
+      $$('#ch .choice', w).forEach(b => b.onclick = () => {
+        const o = s.eq[+b.dataset.i];
+        if (!o.ok) {
+          tries++; b.classList.add('wrong'); b.disabled = true;
+          const h = o.tag === 'op' ? msgs.op : (k === 0 ? 'Start at the beginning of the story. What happens first?' : `Start from what’s there after the first part: ${p.steps[0].ans}.`);
+          $('#hint').textContent = h; Voice.say(h);
+          if (tries < 2) return;
+        }
+        const okBtn = $$('#ch .choice', w).find(x => s.eq[+x.dataset.i].ok); okBtn.classList.add('right'); markChoices(w);
+        $('#hint').textContent = '';
+        Voice.say(eqSay(s.eq.find(o2 => o2.ok).t));
+        let ptries = 0;
+        pad($('#pad'), (x, api) => {
+          if (x === s.ans) {
+            api.disable(); s.done = s.eq.find(o2 => o2.ok).t.map(t => t === '?' ? String(x) : t);
+            k++; if (k < p.steps.length) { Voice.say(`Yes, ${x}.`); later(stepUI, 900); } else { Voice.say(`Yes! ${x}.`); later(advance, 900); }
+          } else {
+            ptries++; P.firstTry = false; api.clear();
+            const h = ptries >= 3 ? `It’s ${s.ans}. ${eqSay(s.eq.find(o2 => o2.ok).t.map(t => t === '?' ? String(s.ans) : t))}.` : 'Not quite. Count carefully. You can count on from the bigger number.';
+            $('#hint').textContent = h; Voice.say(h);
+            if (ptries >= 3) { api.disable(); s.done = s.eq.find(o2 => o2.ok).t.map(t => t === '?' ? String(s.ans) : t); k++; later(k < p.steps.length ? stepUI : advance, 2800); }
+          }
+        });
+      });
+    };
+    stepUI();
+  },
+  solve() {
+    const p = P.p, w = $('#work');
+    const eq = p.solveEq || (p.eq2 ? p.eq2.find(o => o.ok).t : p.eq ? p.eq.find(o => o.ok).t : null);
+    const helper = p.model === 'mountain' ? mountainHTML(false, p.mtn, true) + (p.big2 ? sticksHTML(p.nums) : '')
+      : p.model === 'bars' ? barsHTML(p.bars, false, true)
+      : p.model === 'circles' && p.snap ? `<div class="frames sm">${p.snap}</div>` : '';
+    w.innerHTML = `<p class="prompt">What’s the mystery number?</p>${eq ? `<p class="eqbig">${eqHTML(eq)}</p>` : ''}${helper}<div id="pad"></div><p class="hint" id="hint"></p>`;
+    Voice.say('What’s the mystery number?');
+    let tries = 0;
+    pad($('#pad'), (x, api) => {
+      if (x === p.answer) { api.disable(); $('#hint').textContent = ''; Voice.say(`${x}! Now, ${x} what?`); later(advance, 500); return; }
+      tries++; P.firstTry = false; api.clear();
+      if (tries >= 3) {
+        api.disable(); const s = `The answer is ${p.answer}. ${p.okLine}`;
+        $('#hint').innerHTML = esc(s) + '<br><button class="btn" id="kg" style="margin-top:10px">Keep going</button>';
+        Voice.say(s); $('#kg').onclick = advance; return;
+      }
+      const m = analyze(p, x); $('#hint').textContent = m; Voice.say(m);
+    });
+  },
+  label() {
+    const p = P.p, w = $('#work');
+    const other = p.altLabel && p.altLabel !== p.label ? p.altLabel : pick(ALL_LABELS.filter(l => l !== p.label));
+    const list = shuffle([{ v: p.label, ok: true }, { v: pick(SILLY), silly: true }, { v: other }]);
+    w.innerHTML = `<p class="prompt">${p.answer} what?</p><p class="sub">A good answer has a label.</p><div class="choices">${list.map((o, i) => `<button class="choice" data-i="${i}">${p.answer} ${esc(o.v)}</button>`).join('')}</div><p class="hint" id="hint"></p>`;
+    $$('.choice', w).forEach(b => b.onclick = () => {
+      const o = list[+b.dataset.i];
+      if (o.ok) { b.classList.add('right'); markChoices(w); later(advance, 700); return; }
+      S.mistakes.label++; save(); b.classList.add('wrong'); b.disabled = true;
+      const h = o.silly ? `${p.answer} ${o.v}? That would be silly! Look at the question again.` : 'Look at the question again. What is it asking about?';
+      $('#hint').textContent = h; Voice.say(h);
+    });
+  },
+  check() {
+    const p = P.p, w = $('#work');
+    const ok = P.firstTry; const gain = ok ? 2 : 1;
+    S.snowflakes += gain; P.results.push(ok); save();
+    const last = P.idx + 1 >= P.list.length;
+    w.innerHTML = `<div class="win"><div class="tick" aria-hidden="true">✓</div><p class="answer">${p.answer} ${esc(p.label)}</p>
+      <p class="prompt">Check it: ${esc(p.okLine)}</p><p class="sub">Does it make sense in the story? Yes!</p>
+      <p class="gain">+${gain} ❄</p><button class="btn pop big" id="nx">${last ? 'Finish' : 'Next story'}</button></div>`;
+    $('#fl').textContent = S.snowflakes;
+    const d = $$('.d5')[P.idx]; if (d) d.classList.add(ok ? 'ok' : 'miss');
+    Voice.say(`${p.answer} ${p.label}. ${p.okLine} It makes sense!`);
+    const go = () => { P.idx++; nextProblem(); };
+    $('#nx').onclick = go; $('#nx').focus();
+    keyHandler = e => { if (e.key === 'Enter') { e.preventDefault(); go(); } };
+  }
+};
+
+function drawCircles() {
+  const p = P.p, c = p.circ, w = $('#work');
+  const cells = (c.dir === 'join' ? c.start + c.change : c.start) <= 10 ? 10 : 20;
+  let cnt = 0, joined = 0, phase = 1, wrongs = 0; const crossed = new Set(); const crossOrder = [];
+  w.innerHTML = `<p class="prompt" id="pr"></p><p class="sub" id="sub"></p><div class="frames" id="fr"></div><p class="count" id="cnt"></p>
+    <div class="row center"><button class="btn ghost" id="undo">Take one back</button><button class="btn" id="done">Done</button></div><p class="hint" id="hint"></p>`;
+  const words = () => {
+    if (phase === 1) return [`How many ${p.label} were there at the start?`, 'Tap the frame to draw one circle for each.'];
+    return c.dir === 'join' ? [`Now show this part: “${c.phrase}.”`, 'Tap the frame to add circles in pink.'] : [`Now show this part: “${c.phrase}.”`, 'Tap the circles to cross them out.'];
+  };
+  const paint = () => {
+    const [a, b] = words(); $('#pr').textContent = a; $('#sub').textContent = b;
+    $('#fr').innerHTML = framesHTML(cells, cnt, joined, crossed, true);
+    $('#cnt').textContent = phase === 1 ? `${cnt}` : c.dir === 'join' ? `${cnt} and ${joined} more` : `${crossed.size} crossed out`;
+    $$('#fr .cell').forEach(el => el.onclick = () => {
+      const i = +el.dataset.i;
+      if (phase === 1) { if (cnt < cells) cnt++; }
+      else if (c.dir === 'join') { if (cnt + joined < cells) joined++; }
+      else if (i < cnt) { if (crossed.has(i)) { crossed.delete(i); crossOrder.splice(crossOrder.indexOf(i), 1); } else { crossed.add(i); crossOrder.push(i); } }
+      paint();
+    });
+  };
+  const fail = (msg, fix) => {
+    wrongs++; S.mistakes.draw++; save();
+    if (wrongs >= 3) { fix(); $('#hint').textContent = 'Here’s how it looks.'; Voice.say('Here’s how it looks.'); paint(); later(() => { const d = $('#done'); if (d) d.click(); }, 1600); wrongs = 0; return; }
+    $('#hint').textContent = msg; Voice.say(msg);
+  };
+  $('#undo').onclick = () => {
+    if (phase === 1) cnt = Math.max(0, cnt - 1);
+    else if (c.dir === 'join') joined = Math.max(0, joined - 1);
+    else if (crossOrder.length) crossed.delete(crossOrder.pop());
+    paint();
+  };
+  $('#done').onclick = () => {
+    if (phase === 1) {
+      if (cnt === c.start) { phase = 2; wrongs = 0; $('#hint').textContent = ''; paint(); Voice.say(words().join(' ')); }
+      else fail(`Count again. Read the story: how many ${p.label} were there at the start?`, () => { cnt = c.start; });
+      return;
+    }
+    const doneOK = c.dir === 'join' ? joined === c.change : crossed.size === c.change;
+    if (!doneOK) {
+      return fail(c.dir === 'join' ? 'Look at the story again. How many more joined?' : 'Look at the story again. How many went away?',
+        () => { if (c.dir === 'join') joined = c.change; else { crossed.clear(); crossOrder.length = 0; for (let i = 0; i < c.change; i++) { crossed.add(cnt - 1 - i); crossOrder.push(cnt - 1 - i); } } });
+    }
+    p.snap = framesHTML(cells, cnt, joined, crossed, false);
+    $$('#fr .cell').forEach(el => el.onclick = null); $('#done').disabled = true; $('#undo').disabled = true;
+    const m = c.dir === 'join' ? 'Great drawing! Now you can count them all.' : 'Great drawing! Now count the ones that are left.';
+    $('#hint').textContent = ''; Voice.say(m); $('#cnt').textContent = m;
+    later(advance, 1500);
+  };
+  paint();
+  Voice.say(words().join(' '), true);
+}
+function drawMountain() {
+  const p = P.p, m = p.mtn, w = $('#work');
+  w.innerHTML = `<p class="prompt">Build the Math Mountain.</p><p class="sub">Tap a number, then tap a spot. The total goes on top. The partners go at the bottom.</p>
+    ${mountainHTML(true)}<div class="tray" id="tray"></div>${p.big2 ? sticksHTML(p.nums) : ''}
+    <div class="row center"><button class="btn" id="chk" disabled>Check my mountain</button></div><p class="hint" id="hint"></p>`;
+  Voice.say('Build the Math Mountain. Do I know the total?', true);
+  slotGame(w, [m.top, m.l, m.r], ['top', 'l', 'r'], got => {
+    const okTop = got.top === String(m.top);
+    const okBase = [got.l, got.r].sort().join() === [String(m.l), String(m.r)].sort().join();
+    if (okTop && okBase) return { ok: true };
+    if (!okTop) { S.mistakes.totalSpot++; save(); }
+    const msg = !okTop
+      ? (String(m.top) === '?' ? 'Do we know the total? The story asks for it, so the mystery box goes on top.' : 'Do I know the total? The total is all of them together, and it goes on top.')
+      : 'The top is right! Check the partners.';
+    return { msg, solution: m };
+  }, auto => { Voice.say(`Total on top: ${sayVal(m.top)}. Partners: ${sayVal(m.l)} and ${sayVal(m.r)}.`, auto); later(advance, auto ? 3600 : 1900); });
+}
+function drawBars() {
+  const p = P.p, b = p.bars, w = $('#work');
+  const names = shuffle([b.big.name, b.small.name]);
+  w.innerHTML = `<p class="prompt">Who has more?</p><p class="sub">Their bar will be the longer one.</p>
+    <div class="choices two">${names.map(n => `<button class="choice" data-v="${esc(n)}">${esc(n)}</button>`).join('')}</div><p class="hint" id="hint"></p>`;
+  Voice.say('Who has more?', true);
+  let tries = 0;
+  const phase2 = () => {
+    w.innerHTML = `<p class="prompt">Put the numbers on the bars.</p><p class="sub">${esc(b.big.name)}’s bar is longer. The extra piece shows how many more.</p>
+      ${barsHTML(b, true)}<div class="tray" id="tray"></div><div class="row center"><button class="btn" id="chk" disabled>Check my bars</button></div><p class="hint" id="hint"></p>`;
+    slotGame(w, [b.big.val, b.small.val, b.diff], ['big', 'small', 'diff'], got => {
+      if (got.big === String(b.big.val) && got.small === String(b.small.val) && got.diff === String(b.diff)) return { ok: true };
+      const msg = got.big !== String(b.big.val) ? `${b.big.name} has more, so ${b.big.name}’s number goes on the long bar.` : 'The extra piece is the difference: how many more.';
+      return { msg, solution: { big: b.big.val, small: b.small.val, diff: b.diff } };
+    }, auto => { Voice.say(`${b.big.name}: ${sayVal(b.big.val)}. ${b.small.name}: ${sayVal(b.small.val)}. The extra piece: ${sayVal(b.diff)}.`, auto); later(advance, auto ? 3600 : 2000); });
+  };
+  $$('.choice', w).forEach(btn => btn.onclick = () => {
+    if (btn.dataset.v === b.big.name) { btn.classList.add('right'); markChoices(w); Voice.say(`Yes! ${b.big.name} has more.`); later(phase2, 1100); return; }
+    tries++; btn.classList.add('wrong'); btn.disabled = true;
+    const h = tries >= 2 ? `${b.big.name} has more. Read it again to see why.` : 'Read it again carefully. Who has the bigger amount?';
+    $('#hint').textContent = h; Voice.say(h);
+    if (tries >= 2) { markChoices(w); later(phase2, 2600); }
+  });
+}
+function writeStep(which) {
+  const p = P.p, w = $('#work'); const list = which === 2 ? p.eq2 : p.eq;
+  const q = which === 2 ? 'Now pick an equation you can solve right away.' : 'Which equation tells the story?';
+  const sub = which === 2 ? 'Same story, same answer. This one is easier to solve.' : 'It goes in the order the story happens. The box is the mystery.';
+  w.innerHTML = `<p class="prompt">${q}</p><p class="sub">${sub}</p><div class="choices eqs">${list.map((o, i) => `<button class="choice" data-i="${i}" aria-label="${esc(eqSay(o.t))}">${eqHTML(o.t)}</button>`).join('')}</div><p class="hint" id="hint"></p>`;
+  Voice.say(q);
+  let tries = 0;
+  $$('.choice', w).forEach(b => b.onclick = () => {
+    const o = list[+b.dataset.i];
+    if (o.ok) { b.classList.add('right'); markChoices(w); p.solveEq = o.t; Voice.say('Yes! ' + eqSay(o.t)); later(advance, 1500); return; }
+    tries++; b.classList.add('wrong'); b.disabled = true;
+    let h;
+    if (which === 2) h = 'Which one finds the mystery number right away?';
+    else if (o.tag === 'addAll') { h = 'That one adds every number. Does the story really put them all together?'; S.mistakes.addedAll++; }
+    else if (o.tag === 'moreAdd') { h = 'Careful! “More” doesn’t always mean add. Who has more? Their bar is the long one.'; S.mistakes.moreAdd++; }
+    else if (o.tag === 'op') h = 'Check the action. Did things join, or did things leave?';
+    else if (o.tag === 'order') h = 'Write it in story order: what was there first, what happened, then what’s left.';
+    else h = 'Look where the mystery is. Is it at the start, the middle, or the end of the story?';
+    save();
+    if (tries >= 2) {
+      const r = list.findIndex(x => x.ok); w.querySelector(`.choice[data-i="${r}"]`).classList.add('right'); markChoices(w);
+      p.solveEq = list[r].t; h = 'This is the one. ' + eqSay(list[r].t) + '.'; later(advance, 3000);
+    }
+    $('#hint').textContent = h; Voice.say(h);
+  });
+}
+function analyze(p, x) {
+  let pre = '';
+  const sumAll = p.nums.reduce((a, b) => a + b, 0);
+  if (p.model !== 'three' && x === sumAll && p.answer !== sumAll) {
+    if (p.type === 'cmp_small') { S.mistakes.moreAdd++; pre = 'Careful! “More” doesn’t always mean add. '; }
+    else { S.mistakes.addedAll++; pre = 'It looks like you added all the numbers. '; }
+  } else if (p.partUnknown && x > p.total) {
+    pre = `Your answer is bigger than the total, ${p.total}. A partner can’t be bigger than the whole mountain! `;
+  }
+  save();
+  return pre + p.rb(x) + (p.noSense ? ' Try again.' : ' Does that make sense? Try again.');
+}
+function roundEnd() {
+  const score = P.results.filter(Boolean).length, n = P.list.length, L = lv(P.level);
+  L.rounds++; L.best = Math.max(L.best, score); L.attempts += n; L.firstTry += score; L.recent = [...(L.recent || []), score].slice(-5);
+  let newly = false;
+  if (score >= 4 && !L.mastered) { L.mastered = true; newly = true; }
+  if (score >= 4 && P.level < 8 && S.unlocked < P.level + 1) S.unlocked = P.level + 1;
+  S.log.push({ d: new Date().toISOString().slice(0, 10), level: P.level, score, n }); if (S.log.length > 300) S.log = S.log.slice(-300);
+  save();
+  const msg = score >= 4
+    ? (newly ? (P.level < 8 ? `Trail ${P.level} mastered! Trail ${P.level + 1} is open.` : 'You finished every trail! You’re a word problem expert.') : 'Great round! You read every story carefully.')
+    : score === 3 ? 'So close! One more round and you’ve got it.'
+    : 'Stories can be tricky. Every round makes you stronger. Let’s try this trail again.';
+  const canNext = P.level < 8 && unlockedMax() >= P.level + 1;
+  screen(`<div class="wrap"><section class="card result">
+    <p class="big" aria-label="${score} out of ${n}">${'❄'.repeat(score)}<span style="opacity:.25">${'❄'.repeat(n - score)}</span></p>
+    <h2>${score} of ${n} stories right on the first try</h2><p class="intro idea" style="margin:0 auto 18px">${esc(msg)}</p>
+    <div class="row center">${canNext ? `<button class="btn pop big" id="nextL">Go to trail ${P.level + 1}</button>` : ''}
+      <button class="btn ${canNext ? 'ghost' : 'pop big'}" id="again">Play this trail again</button><button class="btn ghost" id="home">Back to trail map</button></div>
+  </section></div>`);
+  Voice.say(`${score} of ${n} on the first try. ${msg}`);
+  if (score >= 4) snowfall();
+  const lvl = P.level;
+  if ($('#nextL')) $('#nextL').onclick = () => startRound(lvl + 1);
+  $('#again').onclick = () => startRound(lvl); $('#home').onclick = home;
+}
+
+/* ---------------- grown-ups ---------------- */
+const WATCH = [
+  { k:'addedAll', what:'Adds every number in the story', move:'Use a numberless version of the same problem and ask “What’s happening?”' },
+  { k:'totalSpot', what:'Puts the wrong number on top of the Math Mountain', move:'Ask “Do I know the total?” If yes, it goes on top.' },
+  { k:'moreAdd', what:'Sees “more” and adds', move:'“Who has more? Draw the longer bar first.”' },
+  { k:'sort', what:'Misreads what’s happening in the story', move:'Act the story out with toys before solving.' },
+  { k:'draw', what:'Miscounts when drawing', move:'Read the story twice and point to each number while drawing.' },
+  { k:'label', what:'Picks the wrong label', move:'“8 what? 8 elephants?” Make it silly.' }
+];
+function parent() {
+  Voice.stop();
+  const rows = LEVELS.map(L => {
+    const d = lv(L.n); const st = d.mastered ? 'Mastered' : d.rounds ? 'Practicing' : 'Not started';
+    const pct = d.attempts ? Math.round(100 * d.firstTry / d.attempts) + '%' : '–';
+    return `<tr><td>${L.n}</td><td>${esc(L.skill)}</td><td><span class="chip ${d.mastered ? 'm' : d.rounds ? 'p' : ''}">${st}</span></td><td>${d.rounds}</td><td>${d.rounds ? d.best + ' of 5' : '–'}</td><td>${pct}</td></tr>`;
+  }).join('');
+  const watch = WATCH.map(x => `<tr><td>${esc(x.what)}</td><td>${S.mistakes[x.k] || 0}</td><td>${esc(x.move)}</td></tr>`).join('');
+  const pl = S.placement ? `<p>Placement check on ${S.placement.date}: ${S.placement.res.filter(Boolean).length} of 8 correct, started at trail ${S.placement.startAt}.</p>` : '<p>Placement check not taken.</p>';
+  const recent = S.log.slice(-6).reverse().map(r => `<li>${r.d}: trail ${r.level}, ${r.score} of ${r.n}</li>`).join('') || '<li>No rounds yet.</li>';
+  screen(`<div class="wrap">
+    <div class="bar"><h2 style="margin:0">Grown-ups</h2><button class="btn" id="done">Back to the game</button></div>
+    ${storageOK ? '' : '<p class="warn">This browser isn’t saving progress, so everything resets when the page closes.</p>'}
+    <section class="card"><h3>Progress tracker</h3><p>“Mastered” means 4 of 5 stories right on the first try in one round. Each round also mixes in one review story from an earlier trail.</p>
+      <div class="ptable-wrap"><table><thead><tr><th>Trail</th><th>Skill</th><th>Status</th><th>Rounds</th><th>Best</th><th>First try</th></tr></thead><tbody>${rows}</tbody></table></div>
+      ${pl}<p><b>Recent rounds</b></p><ul>${recent}</ul></section>
+    <section class="card"><h3>What to watch for</h3><p>How often each mistake has happened, with the tutor move from the curriculum.</p>
+      <div class="ptable-wrap"><table><thead><tr><th>What you see</th><th>Times</th><th>Tutor move</th></tr></thead><tbody>${watch}</tbody></table></div></section>
+    <section class="card settings"><h3>Settings</h3>
+      <label><input type="checkbox" id="sv" ${S.settings.voice ? 'checked' : ''}> Narrator reads stories aloud</label>
+      <label>Reading speed <input type="range" id="sr" min="0.7" max="1.2" step="0.05" value="${S.settings.rate}"> <button class="btn ghost sm" id="test">Test the voice</button></label>
+      <label><input type="checkbox" id="sn" ${S.settings.numberless ? 'checked' : ''}> Start trail 1 stories without numbers (numberless word problems)</label>
+      <label><input type="checkbox" id="su" ${S.settings.unlockAll ? 'checked' : ''}> Open every trail</label>
+      <label>Child’s name <input type="text" id="sk" value="${esc(S.kidName)}" maxlength="20"></label>
+      <div class="row"><button class="btn ghost sm" id="replace">Take the placement check again</button></div>
+      <div class="danger"><p><b>Start again</b> erases all progress, stars, and snowflakes on this computer. Type START AGAIN to unlock the button.</p>
+        <div class="row"><input type="text" id="sa" aria-label="Type START AGAIN"><button class="btn pop" id="reset" disabled>Erase and start again</button></div></div>
+    </section></div>`);
+  $('#done').onclick = home;
+  $('#sv').onchange = e => { S.settings.voice = e.target.checked; save(); };
+  $('#sr').oninput = e => { S.settings.rate = parseFloat(e.target.value); save(); };
+  $('#test').onclick = () => { const was = S.settings.voice; S.settings.voice = true; Voice.say(`Hi ${kid()}! Let’s read a story together.`); S.settings.voice = was; };
+  $('#sn').onchange = e => { S.settings.numberless = e.target.checked; save(); };
+  $('#su').onchange = e => { S.settings.unlockAll = e.target.checked; save(); };
+  $('#sk').oninput = e => { S.kidName = e.target.value.slice(0, 20); save(); };
+  $('#replace').onclick = placement;
+  $('#sa').oninput = e => { $('#reset').disabled = e.target.value.trim().toUpperCase() !== 'START AGAIN'; };
+  $('#reset').onclick = () => { const name = S.kidName; S = fresh(); S.kidName = name; save(); home(); };
+}
+
+/* ---------------- boot ---------------- */
+load(); Voice.init(); home();
+window.__SKS = { gen, LEVELS, buildRound, get S() { return S; }, get P() { return P; } };
+})();
+</script>
+</body>
+</html>

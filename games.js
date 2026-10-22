@@ -10,6 +10,16 @@ window.HUB = {
 
 window.GAMES = [
   {
+    id: "snow-kingdom-stories",
+    title: "Snow Kingdom Stories",
+    description: "Every word problem is a little story.",
+    emoji: "❄️",
+    color: "#BAE6FD",
+    category: "Math",
+    added: "2026-10-21",
+    status: "ready",
+  },
+  {
     id: "times-tables",          // folder name inside /games/ (lowercase-with-dashes)
     title: "Times Tables",
     description: "Practise tables 1 to 10 and collect stars.",
