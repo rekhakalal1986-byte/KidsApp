@@ -145,10 +145,14 @@
 </div>
 
 <script src="games.js"></script>
+<script src="shared/hub.js"></script>
 <script>
 (function () {
   var HUB = window.HUB || {};
-  var ALL = (window.GAMES || []).filter(function (g) { return g && g.id && g.status !== "hidden"; });
+  // status can be overridden per device by a settings page (see shared/hub.js)
+  var ALL = (window.GAMES || []).filter(function (g) { return g && g.id; }).map(function (g) {
+    return Object.assign({}, g, { status: window.Hub ? Hub.settingFor(g.id, "status", g.status) : g.status });
+  }).filter(function (g) { return g.status !== "hidden"; });
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function href(g) { return g.url || ("games/" + encodeURIComponent(g.id) + "/"); }

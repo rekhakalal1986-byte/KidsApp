@@ -8,6 +8,12 @@ window.HUB = {
   name: "Anvesha",                  // used in the greeting; set to "" to hide
 };
 
+// SETTINGS — apply to every game. To change one game only, add
+// `settings: { ... }` to that game's block below, e.g. settings: { unlockAllLevels: false }
+window.SETTINGS = {
+  unlockAllLevels: true,   // every level/trail open, so she can jump to any of them
+};
+
 window.GAMES = [
   {
     id: "snow-kingdom-stories",

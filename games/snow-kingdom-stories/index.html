@@ -267,7 +267,9 @@ function load() {
 }
 function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); storageOK = true; } catch (e) { storageOK = false; } }
 function lv(n) { return S.levels[n] || (S.levels[n] = { rounds: 0, best: 0, mastered: false, attempts: 0, firstTry: 0, recent: [] }); }
-const unlockedMax = () => S.settings.unlockAll ? 8 : Math.max(1, Math.min(8, S.unlocked));
+// learning hub: games.js SETTINGS.unlockAllLevels opens every trail (overrides the Grown-ups switch)
+const hubUnlockAll = () => !!(window.Hub && typeof Hub.setting === 'function' && Hub.setting('unlockAllLevels', false));
+const unlockedMax = () => (hubUnlockAll() || S.settings.unlockAll) ? 8 : Math.max(1, Math.min(8, S.unlocked));
 const kid = () => (S.kidName || '').trim() || 'friend';
 
 /* ---------------- voice ---------------- */
@@ -1232,7 +1234,7 @@ function parent() {
       <label><input type="checkbox" id="sv" ${S.settings.voice ? 'checked' : ''}> Narrator reads stories aloud</label>
       <label>Reading speed <input type="range" id="sr" min="0.7" max="1.2" step="0.05" value="${S.settings.rate}"> <button class="btn ghost sm" id="test">Test the voice</button></label>
       <label><input type="checkbox" id="sn" ${S.settings.numberless ? 'checked' : ''}> Start trail 1 stories without numbers (numberless word problems)</label>
-      <label><input type="checkbox" id="su" ${S.settings.unlockAll ? 'checked' : ''}> Open every trail</label>
+      <label><input type="checkbox" id="su" ${S.settings.unlockAll || hubUnlockAll() ? 'checked' : ''} ${hubUnlockAll() ? 'disabled' : ''}> Open every trail${hubUnlockAll() ? ' (turned on in the learning hub settings)' : ''}</label>
       <label>Child’s name <input type="text" id="sk" value="${esc(S.kidName)}" maxlength="20"></label>
       <div class="row"><button class="btn ghost sm" id="replace">Take the placement check again</button></div>
       <div class="danger"><p><b>Start again</b> erases all progress, stars, and snowflakes on this computer. Type START AGAIN to unlock the button.</p>
