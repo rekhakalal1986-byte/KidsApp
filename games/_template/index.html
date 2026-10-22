@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Keep these meta tags: they make the game fit the iPad screen and stay full-screen from the Home Screen -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1E1B4B">
+<title>My New Game</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    padding: calc(env(safe-area-inset-top, 0px) + 80px) 20px 40px; /* top space leaves room for the 🏠 button */
+    font-family: "Avenir Next", system-ui, sans-serif;
+    background: #E0F2FE; color: #1E1B4B;
+    display: grid; place-items: center; text-align: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  h1 { font-size: 2.4rem; margin: 0 0 1rem; }
+  .count { font-size: 4rem; font-weight: 800; margin: .5rem 0 1.5rem; }
+  button {
+    font: inherit; font-size: 1.3rem; font-weight: 700;
+    min-width: 160px; min-height: 60px; margin: .4rem; /* big touch targets for small fingers */
+    border: 0; border-radius: 20px; cursor: pointer;
+    background: #F9A8D4; color: #1E1B4B; box-shadow: 0 6px 0 #B5638F;
+  }
+  button:active { transform: translateY(5px); box-shadow: 0 1px 0 #B5638F; }
+  button.quiet { background: #fff; box-shadow: 0 6px 0 #9CA3AF; }
+</style>
+</head>
+<body>
+  <main>
+    <h1>My New Game</h1>
+    <div class="count" id="count">0</div>
+    <button id="tap">Tap me</button>
+    <button id="reset" class="quiet">Start over</button>
+  </main>
+
+  <!-- REQUIRED: connects this game to the homepage. Set data-game to this folder's name. -->
+  <script src="../../shared/hub.js" data-game="my-new-game"></script>
+
+  <script>
+    // Example: progress is saved per game with Hub.save / Hub.load
+    let count = Hub.load("count", 0);
+    const el = document.getElementById("count");
+    el.textContent = count;
+
+    document.getElementById("tap").onclick = () => { count++; el.textContent = count; Hub.save("count", count); };
+    document.getElementById("reset").onclick = () => { Hub.clear(); count = 0; el.textContent = 0; };
+  </script>
+</body>
+</html>
