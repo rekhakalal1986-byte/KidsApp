@@ -149,7 +149,8 @@ h1,h2,h3{margin:0}
 .stop.next{border-color:var(--pop)}
 .sticker{position:absolute; top:-14px; right:-10px; background:var(--pop); color:var(--on-accent); font-weight:700; font-size:18px; padding:4px 12px; border-radius:12px; transform:rotate(8deg)}
 .stop.lockd{opacity:.55}
-.homebtns{display:flex; flex-direction:column; align-items:center; gap:18px; margin:18px 0 6px}
+.homebtns{display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:14px 18px; margin:14px 0 4px}
+@media (orientation:landscape) and (min-width:900px){ .homebtns{flex-direction:column} }
 .parkbtn{min-height:72px}
 .grown{position:relative; overflow:hidden; background:transparent; border:2px dashed var(--line); border-radius:14px; min-height:60px; padding:8px 18px; color:var(--muted); font-size:18px}
 .grown::after{content:""; position:absolute; left:0; bottom:0; height:5px; width:0; background:var(--pop)}
@@ -387,6 +388,9 @@ button[disabled]{opacity:.5; pointer-events:none}
   .treat.sel,.wpet.sel{transform:none}
 }
 .wob-rm{outline:3px dashed var(--pop); outline-offset:3px}
+@keyframes nudge{0%,100%{transform:scale(1)}50%{transform:scale(.96)}}
+.nudge{animation:nudge .18s ease}
+.nudge-rm{outline:3px solid var(--sky); outline-offset:3px}
 </style>
 </head>
 <body>
@@ -473,7 +477,16 @@ function sleep(ms) { return new Promise(r => later(r, ms)); }
 function live(p) { const g = GEN; return Promise.resolve(p).then(v => (g === GEN ? v : new Promise(() => {}))); }
 function bump() { GEN++; timers.forEach(clearTimeout); timers.clear(); Voice.cancel(); }
 // Debounce only a repeat tap on the SAME element (double-fire); a tap on a different target is never dropped.
-function dbl(el, ms) { if (!el) return false; const n = performance.now(); if (n - (el._tapAt || 0) < (ms || 250)) return true; el._tapAt = n; return false; }
+function dbl(el, ms) { if (!el) return false; const n = performance.now(); if (n - (el._tapAt || 0) < (ms || 250)) { nudge(el); return true; } el._tapAt = n; return false; }
+// A tap that is ignored (a repeat, or during a short pause) gets a tiny squeeze so it never feels dead.
+// No sound and no logging. Under reduced motion it is a brief outline instead of movement.
+function nudge(el) {
+  if (!el || el._nudging) return;
+  el._nudging = true;
+  const c = RM() ? "nudge-rm" : "nudge";
+  el.classList.add(c);
+  setTimeout(() => { el.classList.remove(c); el._nudging = false; }, 220);
+}
 
 /* ---------------- storage ---------------- */
 const store = {
@@ -881,8 +894,9 @@ function genPeek(span, baseSz) {
   if (SESSION) { used.push(seq.join("")); SESSION.lastPeek = seq.slice(); saveSession(); }
   const dis = shuffle(pool.filter(p => !seq.includes(p))).slice(0, n - span);
   let choices;
-  for (let k = 0; k < 30; k++) { // reshuffle if the answer is simply "tap across"
+  for (let k = 0; k < 30; k++) { // 3+ pets: reshuffle if the answer is simply "tap across"
     choices = shuffle(seq.concat(dis));
+    if (span < 3) break; // 2 pets: plain shuffle, so left/right order gives no clue
     const idx = seq.map(e => choices.indexOf(e));
     if (!idx.every((v, i) => i === 0 || v > idx[i - 1])) break;
   }
@@ -1213,7 +1227,8 @@ ACT.peek = ctx => {
     const step = ctx.miss();
     ctx.phase = "showing"; lock(btns, true);
     if (step === "hint") {
-      await ctx.say(order ? "That pet was there! Which one came next?" : "Let's watch again.", { hmm: true, speak: order ? "That pet was there! Which one came next? Watch again." : "Let's watch again." });
+      const which = filled === 0 ? "first" : "next";
+      await ctx.say(order ? `That pet was there! Which one came ${which}?` : "Let's watch again.", { hmm: true, speak: order ? `That pet was there! Which one came ${which}? Watch again.` : "Let's watch again." });
       await sleep(300); ctx.bubble("Watch… 👀", true);
       await show(1600);
       answerPhase();
@@ -1275,6 +1290,7 @@ ACT.hide = ctx => {
   };
   dEls.forEach((d, i) => d.addEventListener("click", () => tapDoor(d, i)));
   async function tapDoor(d, i) {
+    if (ctx.phase === "between" && !d.hasAttribute("inert")) { nudge(d); return; } // "Yes!" pause before the next question
     if (!(ctx.phase === "answer" || ctx.phase === "showme") || d.hasAttribute("inert")) return;
     if (dbl(d)) return;
     answered = true; ctx.setHear(null);
@@ -1998,7 +2014,8 @@ function home() {
   const right = el("div", { class: "hcol-r" }, trail);
   const park = el("button", { class: "btn sky parkbtn", onclick: () => petPark("home") }, `🏡 Pet Park (${P.park.pets.length})`);
   const grown = el("button", { class: "grown" }, "Grown-ups: press and hold");
-  s.append(el("div", { class: "home-grid" }, left, right, el("div", { class: "homebtns" }, park, grown)));
+  // DOM order puts the buttons above the trail in portrait; landscape places them by grid area.
+  s.append(el("div", { class: "home-grid" }, left, el("div", { class: "homebtns" }, park, grown), right));
   requestAnimationFrame(drawPath);
   window.onresize = () => requestAnimationFrame(drawPath);
   // grown-ups gate: hold for 2 s

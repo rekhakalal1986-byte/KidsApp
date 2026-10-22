@@ -77,9 +77,9 @@
     css.textContent =
       ".hub-home{position:fixed;z-index:2147483000;" +
       "top:calc(env(safe-area-inset-top,0px) + 12px);left:calc(env(safe-area-inset-left,0px) + 12px);" +
-      "width:54px;height:54px;border-radius:50%;display:grid;place-items:center;" +
+      "width:60px;height:60px;border-radius:50%;display:grid;place-items:center;" +
       "background:#fff;border:3px solid #1E1B4B;box-shadow:0 4px 0 #1E1B4B;" +
-      "font-size:26px;line-height:1;text-decoration:none;-webkit-tap-highlight-color:transparent}" +
+      "font-size:28px;line-height:1;text-decoration:none;-webkit-tap-highlight-color:transparent}" +
       ".hub-home:active{transform:translateY(3px);box-shadow:0 1px 0 #1E1B4B}" +
       ".hub-home:focus-visible{outline:4px solid #FDE047;outline-offset:3px}";
     document.head.appendChild(css);
