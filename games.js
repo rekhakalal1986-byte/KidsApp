@@ -12,9 +12,34 @@ window.HUB = {
 // `settings: { ... }` to that game's block below, e.g. settings: { unlockAllLevels: false }
 window.SETTINGS = {
   unlockAllLevels: true,   // every level/trail open, so she can jump to any of them
+  voice: true,             // read instructions aloud (Web Speech); text always stays on screen
+  speechRate: 0.9,         // speech speed, 0.7 (slow) to 1.1 (quick)
+  soundEffects: true,      // chimes, clicks and pops
 };
 
 window.GAMES = [
+  {
+    id: "pet-puzzle-pals",
+    title: "Pet Puzzle Pals",
+    description: "Watch, remember and spot the rule with Pip the puppy.",
+    emoji: "🐶",
+    color: "#FDE2C8",
+    category: "Logic",
+    added: "2026-10-22",
+    status: "ready",
+    settings: {
+      roundsPerSession: 2,     // rounds before the Bedtime screen (1–3)
+      itemsPerRound: 8,        // 6, 8 or 10 items per round (memory/logic alternate)
+      petBreak: true,          // short Pet Break between rounds
+      memoryPace: "normal",    // "normal" (1.1 s per pet) or "slow" (1.6 s)
+      memoryLevelOffset: 0,    // -1, 0 or +1 added to every memory size
+      adaptiveMemory: true,    // memory items grow/shrink by 1 within a round
+      allowReplay: false,      // 🔊 replay button on memory items before she answers
+      petLabels: true,         // pet names under pets in Who Peeked / Hide and Seek
+      showDemos: true,         // "Watch me" demo the first time she meets an activity
+      crossOff: true,          // ✕ buttons to cross out cards in Who Am I?
+    },
+  },
   {
     id: "snow-kingdom-stories",
     title: "Snow Kingdom Stories",

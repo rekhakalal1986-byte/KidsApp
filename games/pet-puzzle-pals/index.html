@@ -1,0 +1,2275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Keep these meta tags: they make the game fit the iPad screen and stay full-screen from the Home Screen -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1E1B4B">
+<title>Pet Puzzle Pals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Grandstander:wght@800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky-top:#CDEFFF; --meadow:#E6F7D9; --grass:#9BD77F; --panel:#FFFFFF; --panel-2:#FFF7EC; --line:#EAD6BA;
+  --text:#2B2140; --muted:#5E5470; --pop:#C2410C; --pop-dark:#8A2E08; --pop-soft:#FFE8DA;
+  --leaf:#15803D; --leaf-soft:#DCFCE7; --sky:#1D6FB8; --sky-dark:#124A7C; --sky-soft:#DDEFFF;
+  --gold:#A16207; --gold-fill:#FCD34D; --hmm-soft:#FFF4CC; --dim:0.38; --on-accent:#FFFFFF;
+  --shadow:rgba(43,33,64,.16); --collar-red:#DC2626; --collar-blue:#2563EB;
+  --font-display:"Grandstander","Chalkboard SE","Comic Sans MS",system-ui,sans-serif;
+  --font-body:"Fredoka","Nunito","Trebuchet MS",system-ui,sans-serif;
+  --fs-title:44px; --fs-pip:30px; --fs-clue:28px; --fs-btn:26px; --fs-label:22px; --fs-body:18px; --fs-small:18px;
+  --pet-sm:64px; --pet-md:76px; --pet-lg:88px;
+  --r-xl:32px; --r-lg:26px; --r-md:20px; --r-sm:14px; --r-pill:999px; --gap:16px; --gap-lg:24px;
+  --card-lift:0 6px 0 var(--line);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --sky-top:#1E1B4B; --meadow:#173A3F; --grass:#2F6B4F; --panel:#2A2560; --panel-2:#332E72; --line:#4A4596;
+    --text:#FFF8EE; --muted:#C9C2E8; --pop:#FF9A62; --pop-dark:#B85A2A; --pop-soft:#4A2E4E;
+    --leaf:#5EE3A1; --leaf-soft:#1D4D45; --sky:#7CC4FF; --sky-dark:#3F7DB8; --sky-soft:#26407A;
+    --gold:#FFCB45; --gold-fill:#FFCB45; --hmm-soft:#4C4231; --on-accent:#1E1B4B; --shadow:rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --sky-top:#1E1B4B; --meadow:#173A3F; --grass:#2F6B4F; --panel:#2A2560; --panel-2:#332E72; --line:#4A4596;
+  --text:#FFF8EE; --muted:#C9C2E8; --pop:#FF9A62; --pop-dark:#B85A2A; --pop-soft:#4A2E4E;
+  --leaf:#5EE3A1; --leaf-soft:#1D4D45; --sky:#7CC4FF; --sky-dark:#3F7DB8; --sky-soft:#26407A;
+  --gold:#FFCB45; --gold-fill:#FFCB45; --hmm-soft:#4C4231; --on-accent:#1E1B4B; --shadow:rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; min-height:100vh; min-height:100dvh;
+  font-family:var(--font-body); font-size:var(--fs-body); font-weight:500; color:var(--text);
+  background:var(--meadow) linear-gradient(180deg,var(--sky-top),var(--meadow)) fixed;
+  padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);
+  -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;
+}
+body.lock{overflow:hidden; overscroll-behavior:none}
+body.selectable{user-select:text; -webkit-user-select:text; -webkit-touch-callout:default}
+button{font:inherit; color:inherit; border:0; background:none; cursor:pointer; -webkit-tap-highlight-color:transparent; touch-action:manipulation; padding:0}
+:focus-visible{outline:4px solid var(--gold-fill); outline-offset:4px}
+[hidden]{display:none !important}
+.sr{position:fixed; top:0; left:0; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+h1,h2,h3{margin:0}
+.title{font-family:var(--font-display); font-size:var(--fs-title); font-weight:800; line-height:1.1}
+
+/* ---------- buttons ---------- */
+.btn{--btn:var(--panel-2); --btn-dark:var(--line);
+  background:var(--btn); box-shadow:0 8px 0 var(--btn-dark); border-radius:var(--r-md);
+  min-height:64px; padding:10px 26px; font-size:var(--fs-btn); font-weight:700; color:var(--text);
+  transition:transform .08s, box-shadow .08s; line-height:1.15}
+.btn:active{transform:translateY(6px); box-shadow:0 2px 0 var(--btn-dark)}
+.btn.pop{--btn:var(--pop); --btn-dark:var(--pop-dark); color:var(--on-accent)}
+.btn.sky{--btn:var(--sky); --btn-dark:var(--sky-dark); color:var(--on-accent)}
+.ghost{background:var(--panel); border:3px solid var(--line); border-radius:var(--r-md); min-height:60px; min-width:60px;
+  padding:8px 18px; font-size:22px; font-weight:600; color:var(--text)}
+.ghost:active{filter:brightness(.94)}
+.tile{--btn:var(--panel-2); --btn-dark:var(--line);
+  background:var(--btn); box-shadow:0 8px 0 var(--btn-dark); border-radius:var(--r-md);
+  display:inline-flex; flex-direction:column; align-items:center; justify-content:center; position:relative;
+  transition:transform .08s, box-shadow .08s, opacity .2s; color:var(--text); line-height:1; flex:0 0 auto}
+.tile:active{transform:translateY(6px); box-shadow:0 2px 0 var(--btn-dark)}
+.tile small{font-size:var(--fs-label); font-weight:600; margin-top:6px}
+.em{display:inline-block; line-height:1; font-size:var(--es,76px)}
+.em.sz-s{font-size:calc(var(--es,76px)*.5)} .em.sz-m{font-size:calc(var(--es,76px)*.72)} .em.sz-b{font-size:var(--es,76px)}
+.em.flip{transform:scaleX(-1)}
+.cw{position:relative; display:inline-block; line-height:1}
+.collar{position:absolute; left:50%; bottom:6%; width:22px; height:22px; margin-left:-11px; border-radius:50%; border:3px solid #fff}
+.collar.red{background:var(--collar-red)} .collar.blue{background:var(--collar-blue)}
+@media (hover:hover){ .tile:hover,.btn:hover{filter:brightness(1.03)} }
+
+/* ---------- states ---------- */
+.inert{pointer-events:none; opacity:var(--dim)}
+.locked{pointer-events:none}
+.dim{opacity:var(--dim)}
+.right{box-shadow:0 0 0 6px var(--leaf), 0 8px 0 var(--btn-dark,var(--line)) !important; background:var(--leaf-soft) !important; opacity:1 !important}
+.glow{box-shadow:0 0 0 6px var(--leaf), 0 8px 0 var(--btn-dark,var(--line)) !important; animation:breathe 1.2s ease-in-out infinite; opacity:1 !important; z-index:3}
+.peekglow{box-shadow:0 0 0 6px var(--leaf) !important; opacity:1 !important}
+.hand{position:absolute; right:-24px; bottom:-34px; font-size:64px; line-height:1; pointer-events:none; z-index:5}
+.wobble{animation:wobble .3s linear}
+.hop{animation:hop .3s ease}
+.shake{animation:shake .3s linear}
+.pawpop{animation:pawpop .2s ease}
+@keyframes wobble{0%,100%{transform:rotate(0)}17%{transform:rotate(-4deg)}33%{transform:rotate(4deg)}50%{transform:rotate(-4deg)}67%{transform:rotate(4deg)}83%{transform:rotate(-4deg)}}
+@keyframes hop{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes popin{from{transform:scale(.6)}to{transform:scale(1)}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes pawpop{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+@keyframes wag{0%,100%{transform:rotate(0)}33%{transform:rotate(-6deg)}66%{transform:rotate(6deg)}}
+@keyframes fall{from{transform:translateY(0) rotate(0)}to{transform:translateY(110vh) rotate(200deg)}}
+@keyframes rise{from{transform:translateY(0);opacity:1}to{transform:translateY(-120px);opacity:0}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 var(--pop), 0 6px 0 var(--line)}50%{box-shadow:0 0 0 6px var(--pop), 0 6px 0 var(--line)}}
+@keyframes starin{from{transform:scale(.4)}to{transform:scale(1)}}
+
+/* ---------- general screens ---------- */
+.screen{max-width:860px; margin:0 auto; padding:0 20px 40px; position:relative}
+.head{min-height:88px; display:flex; align-items:center; gap:16px; padding-left:76px} /* + 20px screen padding = clear of the 🏠 */
+.chip{background:var(--panel); border-radius:var(--r-pill); padding:10px 18px; font-size:22px; font-weight:600; box-shadow:0 4px 0 var(--line); white-space:nowrap}
+.chip .st{color:var(--gold)}
+.panel{background:var(--panel); border-radius:var(--r-xl); padding:22px; box-shadow:0 8px 0 var(--line)}
+.warn{background:var(--hmm-soft); border-radius:var(--r-md); padding:12px 16px; font-size:18px; margin:10px 0}
+.center{text-align:center}
+.pipface{width:88px; height:88px; border-radius:50%; background:var(--panel-2); border:3px solid var(--line);
+  display:grid; place-items:center; font-size:64px; line-height:1; flex:0 0 auto}
+.pipface.wag{animation:wag .3s ease}
+
+/* ---------- home ---------- */
+.home-top{display:flex; justify-content:flex-end; align-items:center; min-height:84px; padding-left:96px}
+.home-grid{display:block}
+.hero{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap}
+.greet{font-size:24px; font-weight:600; margin:8px 0 0}
+.pipcard{display:flex; align-items:center; gap:12px; background:var(--panel); border-radius:var(--r-lg); padding:10px 16px 10px 10px; box-shadow:var(--card-lift); max-width:380px}
+.pipcard .pc-text{font-size:22px; font-weight:600}
+.keep{display:flex; width:100%; align-items:center; justify-content:space-between; gap:12px; margin:18px 0 0; text-align:left;
+  background:var(--panel); border-radius:var(--r-lg); box-shadow:var(--card-lift); padding:12px 14px 12px 20px; font-size:22px; font-weight:600; min-height:72px}
+.keep .go{background:var(--pop); color:var(--on-accent); border-radius:var(--r-md); min-width:64px; min-height:60px; display:grid; place-items:center; font-size:26px}
+.banner{margin:18px 0 0; background:var(--leaf-soft); border-radius:var(--r-lg); padding:14px 18px; font-size:24px; font-weight:600; text-align:center}
+.playbtn{display:block; width:min(520px,100%); min-height:112px; margin:18px auto 4px; font-size:40px}
+.playbtn .l2{display:block; font-size:24px; font-weight:600; margin-top:4px}
+.trail{position:relative; display:grid; grid-template-columns:repeat(2,minmax(0,360px)); justify-content:center; gap:16px 36px; margin:18px 0 6px}
+.trail svg{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:visible}
+.stop{position:relative; z-index:1; min-height:102px; background:var(--panel); border-radius:var(--r-lg); box-shadow:var(--card-lift);
+  display:grid; grid-template-columns:36px 60px 1fr; align-items:center; gap:10px; padding:10px 14px; text-align:left; border:4px solid transparent}
+.stop.even{margin-top:34px}
+.stop .num{width:36px; height:36px; border-radius:50%; background:var(--sky); color:var(--on-accent); display:grid; place-items:center; font-weight:700; font-size:18px}
+.stop .lem{font-size:52px; line-height:1}
+.stop .nm{font-size:var(--fs-label); font-weight:600; display:block}
+.stop .sb{font-size:18px; color:var(--muted); display:block}
+.stop .stars{color:var(--gold); font-size:22px; letter-spacing:2px; display:block; min-height:4px}
+.stop .stars .off{color:var(--muted)}
+.stop .mini{position:absolute; right:10px; bottom:6px; font-size:28px; line-height:1}
+.stop.next{border-color:var(--pop)}
+.sticker{position:absolute; top:-14px; right:-10px; background:var(--pop); color:var(--on-accent); font-weight:700; font-size:18px; padding:4px 12px; border-radius:12px; transform:rotate(8deg)}
+.stop.lockd{opacity:.55}
+.homebtns{display:flex; flex-direction:column; align-items:center; gap:18px; margin:18px 0 6px}
+.parkbtn{min-height:72px}
+.grown{position:relative; overflow:hidden; background:transparent; border:2px dashed var(--line); border-radius:14px; min-height:60px; padding:8px 18px; color:var(--muted); font-size:18px}
+.grown::after{content:""; position:absolute; left:0; bottom:0; height:5px; width:0; background:var(--pop)}
+.grown.holding::after{width:100%; transition:width 2s linear}
+@media (orientation:landscape) and (min-width:900px){
+  .screen.home{max-width:1140px}
+  .home-grid{display:grid; grid-template-columns:380px 1fr; grid-template-rows:auto 1fr; column-gap:30px; align-items:start}
+  .home-grid .hcol-l{grid-column:1; grid-row:1}
+  .home-grid .hcol-r{grid-column:2; grid-row:1 / span 2}
+  .home-grid .homebtns{grid-column:1; grid-row:2; margin-top:0}
+  .home-grid .trail{margin-top:0}
+  .home-grid .hero{flex-direction:column; align-items:flex-start}
+}
+
+/* ---------- play frame ---------- */
+.play{display:flex; flex-direction:column; position:relative; max-width:1140px; margin:0 auto; overflow:hidden;
+  height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));
+  height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
+.topbar{flex:0 0 88px; display:flex; align-items:center; gap:16px; padding:0 16px 0 96px; min-width:0}
+.paws{display:flex; gap:8px; min-width:0; flex-wrap:nowrap}
+.paw{width:clamp(26px,4.2vw,40px); height:clamp(26px,4.2vw,40px); border-radius:50%; display:grid; place-items:center; font-size:clamp(14px,2.4vw,22px); border:3px dashed var(--line); flex:0 0 auto; background:transparent}
+.paw span{opacity:.25}
+.paw.cur{border:4px solid var(--pop)}
+.paw.gold{background:var(--gold-fill); border:3px solid var(--gold)} .paw.gold span{opacity:1}
+.paw.plain{background:var(--panel); border:3px solid var(--leaf)} .paw.plain span{opacity:1}
+.piprow{flex:0 0 auto; display:flex; align-items:center; gap:14px; padding:2px 16px 10px}
+.bubble{flex:1; min-width:0; position:relative; background:var(--panel); border-radius:var(--r-lg); padding:12px 22px; min-height:84px;
+  font-size:var(--fs-pip); font-weight:600; line-height:1.2; display:flex; align-items:center; gap:14px; box-shadow:0 6px 0 var(--line)}
+.bubble::after{content:""; position:absolute; right:-16px; top:50%; margin-top:-12px; border-style:solid; border-width:12px 0 12px 16px; border-color:transparent transparent transparent var(--panel)}
+.bubble.hmm{background:var(--hmm-soft)} .bubble.hmm::after{border-left-color:var(--hmm-soft)}
+.askchip{font-size:56px; line-height:1; background:var(--panel-2); border-radius:var(--r-md); min-width:72px; min-height:72px; display:grid; place-items:center; flex:0 0 auto}
+.askchip:empty{display:none}
+.hearbtn{width:72px; height:72px; min-height:72px; padding:0; border-radius:50%; font-size:32px; flex:0 0 auto}
+.main{flex:1 1 auto; min-height:0; display:flex; flex-direction:column; justify-content:center; gap:clamp(14px,3dvh,34px); padding:6px 16px 18px; position:relative}
+.stage,.answer{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; min-height:0; min-width:0; position:relative}
+.stage{flex:0 1 auto}
+.answer{flex:0 0 auto}
+@media (orientation:landscape) and (min-width:900px){
+  .main{flex-direction:row; align-items:center}
+  .main .stage{flex:0 0 56%}
+  .main .answer{flex:1 1 44%}
+  .main.col{flex-direction:column}
+  .main.col .stage{flex:0 1 auto}
+  .main.col .answer{flex:0 0 auto}
+}
+.ready{min-width:min(300px,80vw); min-height:clamp(84px,10dvh,120px); font-size:40px}
+.skipper{position:absolute; left:0; right:0; top:88px; bottom:0; z-index:40}
+.demoveil{position:absolute; left:0; right:0; top:88px; bottom:0; z-index:45; background:rgba(255,255,255,.08)}
+.skipbtn{position:absolute; right:16px; top:200px; z-index:60; min-height:64px; font-size:24px}
+.dhand{position:fixed; z-index:70; font-size:72px; line-height:1; pointer-events:none; transition:left .5s ease, top .5s ease, transform .15s}
+.dhand.press{transform:scale(.85)}
+.flyer{position:fixed; z-index:30; pointer-events:none; line-height:1; transition:transform .25s ease}
+.dragghost{position:fixed; z-index:80; pointer-events:none; font-size:72px; line-height:1; transform:translate(-50%,-50%)}
+.introcard{text-align:center; background:var(--panel); border-radius:var(--r-xl); padding:24px 30px; box-shadow:0 8px 0 var(--line); max-width:620px}
+.introcard .bigem{font-size:clamp(80px,11dvh,120px); line-height:1}
+.introcard p{font-size:var(--fs-pip); font-weight:600; margin:12px 0 22px}
+.introcard .btn{min-height:80px; font-size:32px}
+
+/* ---------- Who Peeked ---------- */
+.burrow{width:clamp(150px,24dvh,260px); height:clamp(150px,24dvh,260px); border-radius:50%; background:var(--grass); display:grid; place-items:center; flex:0 0 auto; transition:width .25s, height .25s}
+.burrow.small{width:clamp(100px,14dvh,180px); height:clamp(100px,14dvh,180px)}
+.burrow-in{width:84%; height:84%; border-radius:50%; background:rgba(43,33,64,.85); display:grid; place-items:center; overflow:hidden}
+.peekpet{font-size:clamp(70px,11dvh,120px); line-height:1}
+.peekpet.in{animation:popin .18s ease-out}
+.burrow.small .peekpet{font-size:clamp(56px,8dvh,90px)}
+.peeklabel{font-size:30px; font-weight:600; min-height:36px; line-height:1.2}
+.slots{display:flex; gap:12px; justify-content:center; flex-wrap:wrap}
+.slot{width:clamp(76px,9dvh,96px); height:clamp(76px,9dvh,96px); border:3px dashed var(--sky); border-radius:var(--r-sm); background:var(--sky-soft); position:relative; display:grid; place-items:center; font-size:clamp(48px,6dvh,64px); line-height:1}
+.slot b{position:absolute; top:3px; left:7px; font-size:22px; color:var(--sky); line-height:1}
+.slot.filled{border-style:solid; border-color:var(--leaf); background:var(--leaf-soft)}
+.slot .sp.in{animation:popin .18s ease-out}
+.choices{display:flex; flex-wrap:wrap; gap:14px; justify-content:center}
+.choice{width:clamp(96px,11dvh,112px); min-height:clamp(96px,11dvh,112px); padding:6px 4px; --es:clamp(56px,7dvh,76px)}
+.choices.many .choice{width:100px; min-height:100px; --es:64px}
+.choice.used{opacity:.5}
+.choice.used::before{content:"✓"; position:absolute; top:4px; right:8px; color:var(--leaf); font-size:24px; font-weight:700}
+
+/* ---------- Hide and Seek ---------- */
+.doors{display:grid; gap:20px; justify-content:center}
+.door{width:var(--dsz); height:var(--dsz); position:relative; border-radius:var(--r-md); perspective:700px; background:#FFF7EC; box-shadow:inset 0 0 0 4px rgba(43,33,64,.3)}
+.door .room{position:absolute; inset:0; border-radius:var(--r-md); display:flex; flex-direction:column; align-items:center; justify-content:center; padding-left:26%; color:#2B2140; --es:min(88px, calc(var(--dsz) * .46))}
+.door .room small{font-size:var(--fs-label); font-weight:600}
+.door .room .flower{--es:28px; opacity:.8}
+.door .leafp{position:absolute; inset:0; border-radius:var(--r-md); background:var(--dc);
+  background-image:repeating-linear-gradient(180deg, transparent 0 22%, rgba(43,33,64,.12) 22% calc(22% + 3px));
+  box-shadow:inset 0 0 0 4px rgba(43,33,64,.3); transform-origin:left center; transition:transform .22s ease}
+.door .knob{position:absolute; right:14%; top:50%; width:20px; height:20px; margin-top:-10px; border-radius:50%; background:#2B2140; opacity:.55}
+.door.open .leafp{transform:rotateY(-70deg)}
+.door.right .room{background:var(--leaf-soft)}
+
+/* ---------- Pet Helper ---------- */
+.strip{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; background:var(--panel); border-radius:var(--r-lg); padding:10px 14px; box-shadow:0 6px 0 var(--line)}
+.step{display:flex; flex-direction:column; align-items:center; gap:4px; padding:6px 12px; border-radius:var(--r-md); border:3px solid transparent}
+.step .pair{font-size:clamp(40px,6dvh,72px); line-height:1; white-space:nowrap}
+.step .lab{font-size:28px; font-weight:600}
+.step.lit{background:var(--pop-soft); border-color:var(--pop)}
+.step.ok .lab::after{content:" ✓"; color:var(--leaf)}
+.shelf{display:flex; gap:14px; justify-content:center; flex-wrap:wrap; padding:6px 14px 16px; border-bottom:14px solid var(--line); border-radius:0 0 8px 8px}
+.treat{width:clamp(80px,9dvh,96px); height:clamp(80px,9dvh,96px); --es:clamp(48px,6dvh,60px)}
+.treat.sel{transform:translateY(-8px); box-shadow:0 0 0 5px var(--pop), 0 8px 0 var(--btn-dark)}
+.treat.spent{background:transparent; box-shadow:none; border:3px dashed var(--line)}
+.treat.spent .em{visibility:hidden}
+.petcards{display:flex; gap:16px; justify-content:center; flex-wrap:wrap}
+.petcard{width:clamp(120px,15vw,150px); height:clamp(130px,16dvh,170px); --es:clamp(64px,8dvh,88px)}
+.petcards.target .petcard:not(.inert){outline:4px dashed var(--pop); outline-offset:4px}
+.badges{position:absolute; top:6px; right:6px; display:flex; font-size:36px; line-height:1}
+@media (orientation:landscape) and (min-width:900px){ .petcards{display:grid; grid-template-columns:repeat(2,auto)} }
+
+/* ---------- patterns ---------- */
+.prow{display:flex; flex-direction:column; gap:12px; background:var(--panel); border-radius:var(--r-lg); padding:16px; box-shadow:0 6px 0 var(--line); max-width:100%}
+.pline{display:flex; gap:8px; align-items:flex-end; justify-content:center; position:relative; padding-bottom:18px}
+.ptile{width:var(--ts); height:var(--ts); display:flex; align-items:flex-end; justify-content:center; border-radius:var(--r-sm); position:relative; --es:calc(var(--ts) * .9); flex:0 0 auto}
+.ptile.q{border:4px dashed var(--pop); align-items:center}
+.ptile.q .qm{font-size:calc(var(--ts) * .5); font-weight:700; color:var(--pop)}
+.ptile.q.solved{border-style:solid; border-color:var(--leaf); background:var(--leaf-soft); align-items:flex-end}
+.ptile.lit{background:var(--pop-soft)}
+.bracket{position:absolute; bottom:0; height:14px; border:6px solid var(--sky); border-top:0; border-radius:0 0 12px 12px}
+.pchoice{width:clamp(110px,13dvh,140px); height:clamp(110px,13dvh,140px); --es:clamp(64px,8dvh,88px); justify-content:flex-end; padding-bottom:14px}
+
+/* ---------- cards (odd one out / who am I) ---------- */
+.cards{display:flex; gap:22px; justify-content:center; flex-wrap:wrap}
+.card{width:clamp(130px,19vw,168px); height:clamp(140px,18dvh,190px); --es:88px; justify-content:center}
+.card.group{box-shadow:0 0 0 6px var(--sky), 0 8px 0 var(--btn-dark) !important; opacity:1}
+.rulepanel{background:var(--panel-2); border-radius:var(--r-lg); padding:14px 22px; font-size:var(--fs-clue); font-weight:600; text-align:center; max-width:min(720px,100%); box-shadow:0 6px 0 var(--line)}
+
+/* ---------- pens ---------- */
+.pens{display:flex; gap:20px; justify-content:center; width:100%; flex-wrap:nowrap}
+.pen{flex:0 1 360px; min-width:0; min-height:clamp(190px,30dvh,360px); background:var(--sky-soft); border-radius:var(--r-lg); display:flex; flex-direction:column; overflow:visible; box-shadow:0 6px 0 var(--line); position:relative; border:4px solid transparent}
+.pens.three .pen{flex-basis:240px; min-height:clamp(180px,26dvh,320px)}
+.pen .sign{background:var(--panel); margin:10px 10px 0; border-radius:var(--r-md); padding:6px 8px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; min-height:92px; font-size:var(--fs-clue); font-weight:600; line-height:1.1; text-align:center}
+.pens.three .pen .sign{font-size:22px}
+.pen .sign .se{font-size:40px; line-height:1; white-space:nowrap}
+.pen .sign .se.many{font-size:26px; letter-spacing:-2px}
+.pen .sign .dot{display:inline-block; width:40px; height:40px; border-radius:50%; border:3px solid #fff; flex:0 0 auto}
+.pen .fence{height:22px; margin-top:6px; background:repeating-linear-gradient(90deg, var(--grass) 0 8px, transparent 8px 28px), linear-gradient(180deg, transparent 6px, var(--line) 6px 11px, transparent 11px)}
+.pen .in{flex:1; display:flex; flex-wrap:wrap; gap:8px; align-content:center; justify-content:center; padding:10px; --es:clamp(48px,6dvh,64px)}
+.pens.pulse .pen{animation:pulse 1s ease-in-out infinite}
+.waiting{display:flex; gap:14px; flex-wrap:wrap; justify-content:center}
+.wpet{width:clamp(88px,10dvh,104px); height:clamp(88px,10dvh,104px); --es:clamp(52px,6.5dvh,64px); justify-content:center}
+.wpet.sel{transform:translateY(-8px); box-shadow:0 0 0 5px var(--pop), 0 8px 0 var(--btn-dark)}
+
+/* ---------- who am I ---------- */
+.clues{background:var(--panel); border-radius:var(--r-lg); padding:10px 14px; display:flex; flex-direction:column; gap:6px; box-shadow:0 6px 0 var(--line); width:min(760px,100%)}
+.clue{display:flex; align-items:center; gap:12px; min-height:clamp(56px,7dvh,72px); padding:4px 10px; border-radius:var(--r-md); font-size:var(--fs-clue); font-weight:600; border:4px solid transparent; line-height:1.15}
+.clue .n{width:36px; height:36px; border-radius:50%; background:var(--sky); color:var(--on-accent); display:grid; place-items:center; font-size:20px; flex:0 0 auto}
+.clue .ic{font-size:36px; width:46px; text-align:center; flex:0 0 auto; line-height:1}
+.clue strong{color:var(--pop)}
+.clue.reading{background:var(--pop-soft)}
+.clue.ring{border-color:var(--pop)}
+.clue .ck{margin-left:auto; background:var(--leaf); color:var(--on-accent); border-radius:var(--r-pill); padding:2px 12px; font-size:20px}
+.wwrap{position:relative}
+.wwrap .card{--es:clamp(64px,8dvh,88px)}
+.xbtn{position:absolute; top:-24px; right:-24px; width:60px; height:60px; border-radius:50%; background:var(--panel); border:3px solid var(--line); font-size:26px; font-weight:700; color:var(--muted); z-index:2; box-shadow:0 3px 0 var(--line)}
+.wwrap.crossed .card .em,.wwrap.crossed .card small,.wwrap.ruled .card .em,.wwrap.ruled .card small{opacity:var(--dim)}
+.wwrap.crossed .card::after,.wwrap.ruled .card::after{content:""; position:absolute; inset:16px; pointer-events:none;
+  background:linear-gradient(45deg, transparent calc(50% - 3px), var(--xc) calc(50% - 3px), var(--xc) calc(50% + 3px), transparent calc(50% + 3px)),
+             linear-gradient(-45deg, transparent calc(50% - 3px), var(--xc) calc(50% - 3px), var(--xc) calc(50% + 3px), transparent calc(50% + 3px))}
+.wwrap.crossed{--xc:var(--muted)} .wwrap.ruled{--xc:var(--sky)}
+.wwrap.ruled .card{opacity:1}
+.helpline{font-size:var(--fs-clue); font-weight:600; color:var(--muted); text-align:center}
+
+/* ---------- round done / break / more / bedtime ---------- */
+.bigstars{font-size:72px; color:var(--gold); letter-spacing:12px; line-height:1; margin:10px 0}
+.bigstars span{display:inline-block}
+.bigstars .off{color:var(--muted)}
+.bigstars .in{animation:starin .15s ease-out}
+.pawsum{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:8px 0 18px}
+.pawsum .paw{width:40px; height:40px; font-size:22px}
+.reward{text-align:center; background:var(--panel); border-radius:var(--r-xl); padding:20px; box-shadow:0 8px 0 var(--line); margin:10px auto; max-width:600px}
+.reward .big{font-size:120px; line-height:1}
+.reward p{margin:6px 0; font-size:24px} .reward .lead{font-size:var(--fs-pip); font-weight:600}
+.ribbon{margin:16px auto; max-width:600px; text-align:center; background:var(--pop-soft); border-radius:var(--r-lg); padding:12px; font-size:26px; font-weight:600}
+.stack{display:flex; flex-direction:column; align-items:center; gap:22px; margin:22px 0}
+.confetti{position:fixed; top:-50px; font-size:32px; line-height:1; pointer-events:none; z-index:30; animation:fall 1.2s linear forwards}
+.breakpets{display:flex; flex-wrap:wrap; gap:16px; justify-content:center; margin:14px 0}
+.bpet{width:140px; min-height:160px; --es:76px; padding:8px}
+.bpet.sel{box-shadow:0 0 0 5px var(--pop), 0 8px 0 var(--btn-dark)}
+.carezone{position:relative; text-align:center; margin:10px 0}
+.carezone .big{font-size:clamp(110px,16dvh,160px); line-height:1; display:inline-block}
+.carezone .nm{font-size:30px; font-weight:600}
+.cares{display:flex; gap:20px; justify-content:center; flex-wrap:wrap; margin:14px 0}
+.care{width:120px; height:120px; --es:52px}
+.care .tick{position:absolute; top:6px; right:8px; color:var(--leaf); font-size:26px; font-weight:700}
+.heart{position:absolute; font-size:40px; line-height:1; pointer-events:none; animation:rise .8s ease-out forwards}
+.bed{background:linear-gradient(180deg,#1E1B4B,#2E2A6B); color:#FFF8EE; position:relative; overflow:hidden; display:flow-root;
+  min-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px)); min-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
+.bed .moon{position:absolute; top:24px; right:28px; font-size:64px}
+.bed .star{position:absolute; color:#FFF3C4; font-size:20px; opacity:.8}
+.bed .sleepers{display:flex; flex-wrap:wrap; justify-content:center; gap:22px; font-size:72px; margin:16px 0 14px; line-height:1}
+.bed .line{font-family:var(--font-display); font-size:34px; text-align:center; margin:6px 0}
+.bed .today{font-size:24px; text-align:center; margin:22px 0}
+.bed .ghost{background:#2A2560; border-color:#4A4596; color:#FFF8EE}
+.bed .playmore{margin-top:56px; color:#C9C2E8}
+
+/* ---------- pet park ---------- */
+.meadowpanel{background:linear-gradient(180deg, var(--meadow), var(--grass)); border-radius:var(--r-xl); padding:20px; position:relative; overflow:hidden; box-shadow:0 8px 0 var(--line)}
+.plots{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; position:relative}
+.plot{min-height:200px; background:var(--panel); border-radius:var(--r-lg); box-shadow:var(--card-lift); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; padding:10px 6px; position:relative; text-align:center}
+.plot .pe{font-size:clamp(64px,8dvh,88px); line-height:1; display:inline-block}
+.plot .pn{font-size:var(--fs-label); font-weight:600}
+.plot .gifts{font-size:26px; line-height:1.2; min-height:30px}
+.plot.waiting{background:transparent; box-shadow:none; border:4px dashed var(--line)}
+.plot.waiting .pe{opacity:.4; font-size:56px}
+.plot.waiting .pn{font-size:18px; color:var(--text)}
+.saybub{position:absolute; top:-8px; left:50%; transform:translateX(-50%); background:var(--panel); border:3px solid var(--line); border-radius:var(--r-md); padding:4px 12px; font-size:20px; font-weight:600; white-space:nowrap; z-index:3}
+.parkpip{display:flex; align-items:center; gap:14px; margin:12px 0}
+.parkpip .bubble{font-size:26px; min-height:72px}
+@media (orientation:landscape) and (min-width:900px){ .screen.park{max-width:1140px} .plot{min-height:220px} }
+@media (max-width:640px){ .plots{grid-template-columns:repeat(2,minmax(0,1fr))} .trail{grid-template-columns:minmax(0,1fr)} .stop.even{margin-top:0} }
+
+/* ---------- grown-ups ---------- */
+.gu{max-width:760px}
+.gcard{background:var(--panel); border-radius:var(--r-lg); padding:16px 20px; margin:14px 0; box-shadow:var(--card-lift)}
+.gcard h3{font-size:22px; margin-bottom:8px}
+.gcard table{width:100%; border-collapse:collapse; font-size:18px}
+.gcard td,.gcard th{padding:6px 4px; text-align:left; border-bottom:1px solid var(--line); vertical-align:middle}
+.tchip{display:inline-block; background:var(--pop-soft); border-radius:var(--r-pill); padding:6px 14px; font-weight:600; font-size:20px}
+.sw{display:flex; width:100%; min-height:64px; align-items:center; justify-content:space-between; gap:12px; font-size:20px; text-align:left}
+.sw .knob{width:72px; height:44px; border-radius:var(--r-pill); background:var(--line); position:relative; flex:0 0 auto}
+.sw .knob::after{content:""; position:absolute; top:5px; left:5px; width:34px; height:34px; border-radius:50%; background:#fff; box-shadow:0 2px 4px rgba(0,0,0,.25); transition:left .15s}
+.sw[aria-checked="true"] .knob{background:var(--leaf)}
+.sw[aria-checked="true"] .knob::after{left:33px}
+.muted{color:var(--muted)}
+.resetbox{border:2px solid var(--pop)}
+.row{display:flex; gap:14px; flex-wrap:wrap; align-items:center}
+button[disabled]{opacity:.5; pointer-events:none}
+
+/* ---------- reduced motion ---------- */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important; transition:none !important}
+  .btn:active,.tile:active{transform:none !important; filter:brightness(.92)}
+  .glow{box-shadow:0 0 0 8px var(--leaf) !important}
+  .door.open .leafp{visibility:hidden}
+  .pens.pulse .pen{border-color:var(--pop)}
+  .treat.sel,.wpet.sel{transform:none}
+}
+.wob-rm{outline:3px dashed var(--pop); outline-offset:3px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="pip-live" class="sr" aria-live="polite"></div>
+
+<!-- REQUIRED: connects this game to the homepage. -->
+<script src="../../shared/hub.js" data-game="pet-puzzle-pals"></script>
+
+<script>
+"use strict";
+/* =====================================================================
+   Pet Puzzle Pals — memory and logic practice with Pip the puppy.
+   Plain JS, no build step. Progress: Hub.save/Hub.load ("progress",
+   "rounds" (one per level), "session"). Settings: Hub.setting (see games.js).
+   ===================================================================== */
+const GAME_ID = "pet-puzzle-pals";
+
+/* ---------------- settings ---------------- */
+const DEFAULTS = {
+  unlockAllLevels: true, voice: true, speechRate: 0.9, soundEffects: true,
+  roundsPerSession: 2, itemsPerRound: 8, petBreak: true, memoryPace: "normal",
+  memoryLevelOffset: 0, adaptiveMemory: true, allowReplay: false, petLabels: true,
+  showDemos: true, crossOff: true,
+};
+function setting(key) {
+  const fb = DEFAULTS[key];
+  try { if (window.Hub && typeof Hub.setting === "function") return Hub.setting(key, fb); } catch (e) {}
+  return fb;
+}
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const S = {
+  unlockAll: () => setting("unlockAllLevels") !== false,
+  voice: () => setting("voice") !== false,
+  rate: () => { const r = Number(setting("speechRate")); return isFinite(r) && r > 0 ? clamp(r, 0.7, 1.1) : 0.9; },
+  sound: () => setting("soundEffects") !== false,
+  rounds: () => clamp(Math.round(Number(setting("roundsPerSession")) || 2), 1, 3),
+  items: () => { const n = Number(setting("itemsPerRound")); return n === 6 || n === 10 ? n : 8; },
+  petBreak: () => setting("petBreak") !== false,
+  pace: () => (setting("memoryPace") === "slow" ? "slow" : "normal"),
+  offset: () => clamp(Math.round(Number(setting("memoryLevelOffset")) || 0), -1, 1),
+  adaptive: () => setting("adaptiveMemory") !== false,
+  replay: () => setting("allowReplay") === true,
+  labels: () => setting("petLabels") !== false,
+  demos: () => setting("showDemos") !== false,
+  crossOff: () => setting("crossOff") !== false,
+};
+const PACE_MS = () => (S.pace() === "slow" ? 1600 : 1100);
+const PACE_MULT = () => (S.pace() === "slow" ? 1600 / 1100 : 1);
+const kidName = () => String((window.HUB && window.HUB.name) || "").trim();
+
+/* ---------------- tiny helpers ---------------- */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const rnd = n => Math.floor(Math.random() * n);
+const pick = a => a[rnd(a.length)];
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const RM = () => { try { return matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) { return false; } };
+const capFirst = s => s.charAt(0).toUpperCase() + s.slice(1);
+const art = w => (/^[aeiou]/i.test(w) ? "an" : "a");
+function el(tag, props, ...kids) {
+  const e = document.createElement(tag);
+  if (props) for (const k in props) {
+    const v = props[k];
+    if (v == null || v === false) continue;
+    if (k === "class") e.className = v;
+    else if (k === "text") e.textContent = v;
+    else if (k === "html") e.innerHTML = v;
+    else if (k === "style") e.style.cssText = v;
+    else if (k.slice(0, 2) === "on" && typeof v === "function") e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v === true ? "" : v);
+  }
+  for (const c of kids.flat(3)) if (c != null && c !== false) e.append(c.nodeType ? c : document.createTextNode(String(c)));
+  return e;
+}
+
+/* Screen generations: every screen / item change bumps GEN, clears pending
+   timers and stops speech, so stale async flows quietly stop. */
+let GEN = 0;
+const timers = new Set();
+function later(fn, ms) { const id = setTimeout(() => { timers.delete(id); fn(); }, ms); timers.add(id); return id; }
+function sleep(ms) { return new Promise(r => later(r, ms)); }
+function live(p) { const g = GEN; return Promise.resolve(p).then(v => (g === GEN ? v : new Promise(() => {}))); }
+function bump() { GEN++; timers.forEach(clearTimeout); timers.clear(); Voice.cancel(); }
+// Debounce only a repeat tap on the SAME element (double-fire); a tap on a different target is never dropped.
+function dbl(el, ms) { if (!el) return false; const n = performance.now(); if (n - (el._tapAt || 0) < (ms || 250)) return true; el._tapAt = n; return false; }
+
+/* ---------------- storage ---------------- */
+const store = {
+  load(k, fb) { try { return (window.Hub && typeof Hub.load === "function") ? Hub.load(k, fb) : fb; } catch (e) { return fb; } },
+  save(k, v) { try { return !!(window.Hub && typeof Hub.save === "function" && Hub.save(k, v)); } catch (e) { return false; } },
+};
+const storageOK = store.save("probe", 1);
+
+/* ---------------- voice ---------------- */
+const liveRegion = document.getElementById("pip-live");
+const Voice = {
+  ok: ("speechSynthesis" in window) && (typeof SpeechSynthesisUtterance !== "undefined"),
+  v: null,
+  init() {
+    if (!this.ok) return;
+    const choose = () => {
+      try {
+        const vs = speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang));
+        const prefs = [/samantha/i, /aria/i, /jenny/i, /ava/i, /allison/i, /zira/i, /susan/i, /victoria/i, /karen/i, /moira/i, /tessa/i, /serena/i, /female/i, /google us english/i, /google uk english female/i];
+        for (const p of prefs) { const f = vs.find(v => p.test(v.name)); if (f) { this.v = f; return; } }
+        this.v = vs[0] || null;
+      } catch (e) {}
+    };
+    choose();
+    try { speechSynthesis.addEventListener("voiceschanged", choose); } catch (e) { try { speechSynthesis.onvoiceschanged = choose; } catch (e2) {} }
+  },
+  on() { return this.ok && S.voice(); },
+  cancel() { if (this.ok) try { speechSynthesis.cancel(); } catch (e) {} },
+  mirror(t) { if (liveRegion && t) liveRegion.textContent = t; },
+  // Returns a promise that resolves when speech ends (never blocks taps).
+  // opts.queue: don't cancel what is playing. opts.wait: when voice is off,
+  // wait 2.5 s per sentence instead of resolving at once.
+  say(text, opts) {
+    opts = opts || {};
+    text = String(text || "").trim();
+    this.mirror(text);
+    if (!text) return Promise.resolve();
+    if (!this.on()) {
+      const n = opts.wait ? 2500 * Math.max(1, (text.match(/[.!?]+(\s|$)/g) || [1]).length) : 0;
+      return new Promise(r => setTimeout(r, n));
+    }
+    return new Promise(res => {
+      let done = false, safety = null;
+      const fin = () => { if (!done) { done = true; if (safety) clearTimeout(safety); res(); } };
+      try {
+        if (!opts.queue) speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        if (this.v) { u.voice = this.v; u.lang = this.v.lang; } else u.lang = "en-US";
+        u.rate = S.rate(); u.pitch = 1.1;
+        u.onend = fin; u.onerror = fin;
+        speechSynthesis.speak(u);
+        safety = setTimeout(fin, 2000 + text.length * 95 / S.rate() + (opts.queue ? 3000 : 0));
+      } catch (e) { fin(); }
+    });
+  },
+  unlock() {
+    if (!this.on()) return;
+    try { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
+  },
+};
+Voice.init();
+
+/* ---------------- sound (Web Audio, synthesised) ---------------- */
+const Sound = {
+  ctx: null, master: null,
+  ensure() {
+    try {
+      if (!this.ctx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        this.ctx = new AC(); this.master = this.ctx.createGain(); this.master.gain.value = 0.5; this.master.connect(this.ctx.destination);
+      }
+      if (this.ctx.state === "suspended") this.ctx.resume().catch(() => {});
+    } catch (e) { return null; }
+    return this.ctx;
+  },
+  tone(f, at, dur, type, gain, fEnd) {
+    const c = this.ctx, t = c.currentTime + at;
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = type || "sine"; o.frequency.setValueAtTime(f, t);
+    if (fEnd) o.frequency.exponentialRampToValueAtTime(fEnd, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(gain, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(this.master); o.start(t); o.stop(t + dur + 0.05);
+  },
+  noise(dur, gain) {
+    const c = this.ctx, t = c.currentTime, len = Math.floor(c.sampleRate * dur);
+    const b = c.createBuffer(1, len, c.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    const s = c.createBufferSource(); s.buffer = b;
+    const bp = c.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 2000;
+    const g = c.createGain(); g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(bp); bp.connect(g); g.connect(this.master); s.start(t); s.stop(t + dur + 0.02);
+  },
+  play(name, i) {
+    if (!S.sound()) return;
+    if (!this.ensure()) return;
+    try {
+      switch (name) {
+        case "chime": this.tone(880, 0, 0.11, "sine", 0.12); this.tone(1320, 0.11, 0.11, "sine", 0.12); break;
+        case "hmm": this.tone(392, 0, 0.18, "triangle", 0.06, 330); break;
+        case "pop": this.tone(400, 0, 0.08, "sine", 0.08, 800); break;
+        case "click": this.noise(0.025, 0.1); break;
+        case "cross": this.tone(300, 0, 0.06, "sine", 0.05); break;
+        case "star": this.tone([1046.5, 1318.5, 1568][i || 0], 0, 0.14, "sine", 0.1); break;
+        case "done": [523.25, 659.25, 783.99, 1046.5].forEach((f, k) => this.tone(f, k * 0.09, 0.09, "triangle", 0.1)); break;
+        case "heart": this.tone(660, 0, 0.12, "sine", 0.06); break;
+        case "bedtime": [783.99, 659.25, 523.25].forEach((f, k) => this.tone(f, k * 0.3, 0.3, "sine", 0.06)); break;
+      }
+    } catch (e) {}
+  },
+};
+
+/* iOS needs a user gesture before sound and speech. */
+document.addEventListener("pointerdown", function unlockOnce() {
+  document.removeEventListener("pointerdown", unlockOnce, true);
+  Sound.ensure(); Voice.unlock();
+}, true);
+
+/* ---------------- emoji support check (canvas) ---------------- */
+// A colour emoji has coloured pixels; a missing glyph (tofu box) is grey or blank.
+function emojiOK(ch) {
+  try {
+    const c = document.createElement("canvas"); c.width = c.height = 40;
+    const x = c.getContext("2d"); if (!x) return true;
+    x.textBaseline = "top"; x.font = "32px sans-serif"; x.fillText(ch, 2, 2);
+    const d = x.getImageData(0, 0, 40, 40).data;
+    for (let i = 0; i < d.length; i += 4) {
+      if (d[i + 3] > 40 && (Math.abs(d[i] - d[i + 1]) > 30 || Math.abs(d[i + 1] - d[i + 2]) > 30 || Math.abs(d[i] - d[i + 2]) > 30)) return true;
+    }
+    return false;
+  } catch (e) { return true; }
+}
+const EM = { brush: "🪮", feather: "🪶", nest: "🪺" };
+try {
+  if (!emojiOK("🪮")) EM.brush = "✨";
+  if (!emojiOK("🪶")) EM.feather = "🐦";
+  if (!emojiOK("🪺")) EM.nest = "🌳";
+} catch (e) {}
+
+/* ---------------- visual helpers ---------------- */
+function setInert(b, on, noDim) {
+  if (!b) return;
+  b.classList.toggle(noDim ? "locked" : "inert", !!on);
+  if (!on) b.classList.remove("inert", "locked");
+  if (on) b.setAttribute("inert", ""); else b.removeAttribute("inert");
+}
+function lock(list, on, noDim) { list.forEach(b => setInert(b, on, noDim)); }
+function wobble(e, dim) {
+  if (!e) return;
+  if (RM()) { e.classList.add("wob-rm"); setTimeout(() => { e.classList.remove("wob-rm"); if (dim) e.classList.add("dim"); }, 600); }
+  else { e.classList.remove("wobble"); void e.offsetWidth; e.classList.add("wobble"); setTimeout(() => { e.classList.remove("wobble"); if (dim) e.classList.add("dim"); }, 320); }
+}
+function hop(e) { if (!e || RM()) return; e.classList.remove("hop"); void e.offsetWidth; e.classList.add("hop"); setTimeout(() => e.classList.remove("hop"), 320); }
+function shake(e) { if (!e) return; if (RM()) { wobble(e); return; } e.classList.remove("shake"); void e.offsetWidth; e.classList.add("shake"); setTimeout(() => e.classList.remove("shake"), 320); }
+function glow(e) {
+  if (!e) return;
+  setInert(e, false); e.classList.remove("dim"); e.classList.add("glow");
+  if (!e.querySelector(":scope > .hand")) e.append(el("span", { class: "hand", "aria-hidden": "true" }, "👆"));
+}
+function unglow(e) { if (!e) return; e.classList.remove("glow"); const h = e.querySelector(":scope > .hand"); if (h) h.remove(); }
+function fly(fromEl, toEl, content, done) {
+  if (RM() || !fromEl || !toEl) { done(); return; }
+  try {
+    const a = fromEl.getBoundingClientRect(), b = toEl.getBoundingClientRect();
+    const f = el("div", { class: "flyer", style: `left:${a.left}px;top:${a.top}px;font-size:${Math.max(40, a.height)}px` }, content);
+    document.body.append(f);
+    requestAnimationFrame(() => { f.style.transform = `translate(${b.left + b.width / 2 - (a.left + a.width / 2)}px,${b.top + b.height / 2 - (a.top + a.height / 2)}px)`; });
+    setTimeout(() => { f.remove(); done(); }, 260);
+  } catch (e) { done(); }
+}
+/* Drag support (tap-tap always works; this is the optional extra). */
+function findZone(zones, x, y) {
+  let best = null, bd = 1e9;
+  for (const z of zones) {
+    if (!z.isConnected) continue;
+    const r = z.getBoundingClientRect();
+    if (x >= r.left - 24 && x <= r.right + 24 && y >= r.top - 24 && y <= r.bottom + 24) return z;
+    const d = Math.hypot(x - (r.left + r.right) / 2, y - (r.top + r.bottom) / 2);
+    if (d < bd) { bd = d; best = z; }
+  }
+  return bd <= 120 ? best : null;
+}
+function draggable(src, getZones, onDrop, canDrag) {
+  src.style.touchAction = "none";
+  let st = null;
+  src.addEventListener("pointerdown", e => {
+    if (src.hasAttribute("inert") || (canDrag && !canDrag())) return;
+    st = { x: e.clientX, y: e.clientY, id: e.pointerId, ghost: null };
+  });
+  src.addEventListener("pointermove", e => {
+    if (!st || e.pointerId !== st.id) return;
+    if (!st.ghost && Math.hypot(e.clientX - st.x, e.clientY - st.y) >= 10) {
+      try { src.setPointerCapture(e.pointerId); } catch (_) {}
+      const em = src.querySelector(".em");
+      st.ghost = el("div", { class: "dragghost" }, em ? em.cloneNode(true) : src.textContent);
+      document.body.append(st.ghost);
+    }
+    if (st.ghost) {
+      let x = e.clientX, y = e.clientY;
+      if (x < 120 && y < 120) { if (x < y) x = 120; else y = 120; } // keep the 🏠 corner clear
+      st.ghost.style.left = x + "px"; st.ghost.style.top = y + "px";
+    }
+  });
+  const end = e => {
+    if (!st || e.pointerId !== st.id) return;
+    const g = st.ghost; st = null;
+    if (!g) return;
+    src._dragEnd = performance.now();
+    const zone = findZone(getZones(), e.clientX, e.clientY);
+    if (zone) { g.remove(); onDrop(zone); return; }
+    if (RM()) { g.remove(); onDrop(null); return; }
+    const r = src.getBoundingClientRect();
+    g.style.transition = "left .2s, top .2s"; g.style.left = (r.left + r.width / 2) + "px"; g.style.top = (r.top + r.height / 2) + "px";
+    setTimeout(() => g.remove(), 210); onDrop(null);
+  };
+  src.addEventListener("pointerup", end);
+  src.addEventListener("pointercancel", () => { if (st && st.ghost) st.ghost.remove(); st = null; });
+}
+const recentDrag = b => performance.now() - (b._dragEnd || 0) < 400;
+
+/* =====================================================================
+   CONTENT BANK (from 02-learning-design.md section 9)
+   ===================================================================== */
+const NAME = {
+  "🐶": "dog", "🐱": "cat", "🐰": "bunny", "🐠": "fish", "🦜": "parrot", "🐴": "pony", "🐢": "turtle", "🐹": "hamster", "🦆": "duck", "🐸": "frog",
+  "🦉": "owl", "🐝": "bee", "🦋": "butterfly", "🦇": "bat", "🐌": "snail", "🐧": "penguin", "🐔": "chicken", "🐦": "bird",
+  "🐙": "octopus", "🐳": "whale", "🐬": "dolphin", "🦈": "shark", "🐡": "puffer fish",
+  "🐮": "cow", "🐷": "pig", "🐑": "sheep", "🐭": "mouse", "🐻": "bear", "🐘": "elephant", "🦒": "giraffe", "🦓": "zebra",
+  "🐯": "tiger", "🦁": "lion", "🐞": "ladybug", "🐺": "wolf",
+};
+const TREAT = { "🦴": "bone", "🐟": "fish", "🥕": "carrot", "⚽": "ball", "🧶": "yarn", "🍎": "apple", "🧸": "teddy", "🎾": "tennis ball" };
+const TREAT_SAY = { "🦴": "a bone", "🐟": "a fish", "🥕": "a carrot", "⚽": "a ball", "🧶": "some yarn", "🍎": "an apple", "🧸": "the teddy" };
+const PLURAL = { dog: "dogs", cat: "cats", bunny: "bunnies", fish: "fish", pony: "ponies", turtle: "turtles", duck: "ducks", hamster: "hamsters", parrot: "parrots" };
+const nm = e => NAME[e] || TREAT[e] || "pet";
+const PEEK_POOL = ["🐶", "🐱", "🐰", "🐠", "🦜", "🐴", "🐢", "🐹", "🦆", "🐸"];
+const E = s => Array.from(s);
+
+const LEVELS = [null,
+  { name: "Puppy Park", e: "🐶", sub: "Peek · Patterns", intro: "Watch the pets peek out. Then find what comes next!", pet: "Biscuit", kind: "dog", mem: "peek", sz: 2, logic: "next", set: "L1" },
+  { name: "Kitten Corner", e: "🐱", sub: "Hide · Odd one out", intro: "Look where the pets hide. Then find the one that is different!", pet: "Mittens", kind: "cat", mem: "hide", sz: 2, logic: "odd", set: "L2" },
+  { name: "Bunny Garden", e: "🐰", sub: "Peek · Patterns", intro: "Three pets will peek. Say their names with me!", pet: "Clover", kind: "bunny", mem: "peek", sz: 3, logic: "next", set: "L3" },
+  { name: "Fish Pond", e: "🐠", sub: "Pet jobs · Pens", intro: "Listen to the job, then do it. First… then…", pet: "Bubbles", kind: "fish", mem: "helper", sz: 2, logic: "pens", set: "L4" },
+  { name: "Parrot Tree", e: "🦜", sub: "Hide · Odd one out", intro: "Find the hiding pets. Then find who doesn't belong!", pet: "Kiwi", kind: "parrot", mem: "hide", sz: 3, logic: "odd", set: "L5" },
+  { name: "Pony Farm", e: "🐴", sub: "Peek · Who am I?", intro: "Four pets will peek. Then listen to the clues!", pet: "Pepper", kind: "pony", mem: "peek", sz: 4, logic: "who", set: "L6" },
+  { name: "Turtle Beach", e: "🐢", sub: "Pet jobs · Pens · Patterns", intro: "Three jobs to remember. Then sort the pets by a rule!", pet: "Shelly", kind: "turtle", mem: "helper", sz: 3, logic: "pens", set: "L7" },
+  { name: "Pet Show", e: "🐹", sub: "A bit of everything", intro: "The Pet Show! A bit of everything. You can do it!", pet: "Peanut", kind: "hamster" },
+];
+const GIFTS = ["🧶", "🎾", "🦴", "🛏️", "🧸", "🥕", "🍎", "🎩", "🧢", "⭐"];
+const MEM = ["peek", "hide", "helper"];
+const ACTS = ["peek", "hide", "helper", "next", "odd", "pens", "who"];
+const ACT_NAME = { peek: "Who Peeked", hide: "Hide and Seek", helper: "Pet Helper", next: "What Comes Next", odd: "Odd One Out", pens: "Pet Pens", who: "Who Am I?" };
+
+/* ---- Who Peeked / Hide and Seek pools (LD "Round 1 content fixes", issue 2) ----
+   Every sequence is generated; nothing is taken from a fixed list. */
+const LEVEL_POOLS = [E("🐶🐱🐰🐠🦜🐢"), E("🐶🐱🐰🐠🦜🐢🐴🐹"), E("🐶🐱🐰🐠🦜🐢🐴🐹🦆🐸")];
+// L1-L2: 6 pets, L3-L5: 8, L6+: 10. If a bigger span needs more pets, use the next pool.
+function poolFor(level, need) { let k = level >= 6 ? 2 : level >= 3 ? 1 : 0; while (k < 2 && LEVEL_POOLS[k].length < need) k++; return LEVEL_POOLS[k]; }
+const afterDemo = {}; // activity type -> true for the first real item after its demo
+
+/* ---- Pet Helper jobs ---- */
+const WORD2E = { dog: "🐶", cat: "🐱", bunny: "🐰", pony: "🐴", bone: "🦴", fish: "🐟", carrot: "🥕", ball: "⚽", yarn: "🧶", apple: "🍎" };
+const TREATS = ["🦴", "🐟", "🥕", "⚽", "🧶", "🍎"];
+const parseJob = s => s.split(",").map(p => { const [a, b] = p.trim().split(" "); return { pet: WORD2E[a], treat: WORD2E[b] }; });
+const JOBS2 = ["dog bone, cat fish", "bunny carrot, cat yarn", "cat fish, dog ball", "dog bone, bunny carrot", "bunny ball, dog bone",
+  "dog carrot, bunny ball", "cat bone, dog fish", "bunny yarn, cat carrot", "dog yarn, cat ball", "cat carrot, bunny bone"].map(parseJob);
+const JOBS3 = ["cat ball, pony apple, bunny carrot", "dog bone, cat fish, pony apple", "bunny carrot, dog ball, cat yarn", "pony apple, bunny carrot, dog bone",
+  "dog fish, pony yarn, cat apple", "bunny bone, cat carrot, pony ball", "pony fish, dog apple, bunny yarn", "cat bone, bunny ball, dog carrot"].map(parseJob);
+
+/* ---- What Comes Next / Tricky Patterns ---- */
+// t: tiles (one entry per position, "?" marks the gap), a: answer tile.
+const T = (e, extra) => Object.assign({ e }, extra || {});
+const NEXT_L1 = [["🐶🐱🐶🐱🐶", "🐱"], ["🐰🐠🐰🐠", "🐰"], ["🦜🐢🦜🐢🦜", "🐢"], ["🐴🐹🐴🐹", "🐴"], ["🐱🦆🐱🦆🐱", "🦆"], ["🐠🐶🐠🐶", "🐠"], ["🐢🐰🐢🐰🐢", "🐰"], ["🦆🐴🦆🐴", "🦆"]]
+  .map(([s, a]) => ({ t: E(s).map(e => T(e)).concat(["?"]), a: T(a) }));
+const NEXT_L3 = [["🐰🐰🐹🐰🐰🐹🐰", "🐰"], ["🐶🐱🐱🐶🐱🐱🐶", "🐱"], ["🐠🦜🐢🐠🦜", "🐢"], ["🐴🐴🐶🐴🐴", "🐶"], ["🦆🐰🐰🦆🐰", "🐰"], ["🐱🐠🐴🐱🐠🐴🐱", "🐠"], ["🐢🐢🦜🐢🐢🦜🐢", "🐢"], ["🐹🐶🐱🐹🐶", "🐱"]]
+  .map(([s, a]) => ({ t: E(s).map(e => T(e)).concat(["?"]), a: T(a) }));
+const NEXT_T = [
+  { t: E("🐶🐶🐱🐱🐶🐶🐱").map(e => T(e)).concat(["?"]), a: T("🐱") },
+  { t: [T("🐠"), "?", T("🐢"), T("🐠"), T("🦜"), T("🐢")], a: T("🦜") },
+  { t: ["b", "s", "s", "b", "s"].map(z => T("🐰", { size: z })).concat(["?"]), a: T("🐰", { size: "s" }), kind: "size" },
+  { t: [false, true, false, true, false].map(f => T("🐴", { flip: f })).concat(["?"]), a: T("🐴", { flip: true }), kind: "facing" },
+  { t: E("🐱🐶🐰🐠🐱🐶🐰").map(e => T(e)).concat(["?"]), a: T("🐠") },
+  { t: [T("🦆"), T("🦆"), T("🐸"), T("🦆"), "?", T("🐸")], a: T("🦆") },
+  { t: ["s", "m", "b", "s", "m"].map(z => T("🐢", { size: z })).concat(["?"]), a: T("🐢", { size: "b" }), kind: "size" },
+  { t: [T("🐹"), T("🐹"), T("🦜"), "?", T("🐹"), T("🐹"), T("🦜"), T("🦜")], a: T("🦜") },
+];
+
+/* ---- Odd One Out ---- */
+const L2HINT = "Three are the same. Look at each one.";
+const ODD_L2 = [
+  { t: E("🐶🐶🐶🐱").map(e => T(e)), a: 3, rule: ["Three are dogs.", "The cat is different."] },
+  { t: E("🐰🐹🐰🐰").map(e => T(e)), a: 1, rule: ["Three are bunnies.", "The hamster is different."] },
+  { t: E("🐠🐠🦜🐠").map(e => T(e)), a: 2, rule: ["Three are fish.", "The parrot is different."] },
+  { t: E("🐱🐱🐱🐭").map(e => T(e)), a: 3, rule: ["Three are cats.", "The mouse is different."] },
+  { t: E("🐴🐢🐴🐴").map(e => T(e)), a: 1, rule: ["Three are ponies.", "The turtle is different."] },
+  { t: E("🦆🦆🦆🦉").map(e => T(e)), a: 3, rule: ["Three are ducks.", "The owl is different."] },
+  { t: E("🐢🐢🐌🐢").map(e => T(e)), a: 2, rule: ["Three are turtles.", "The snail is different."] },
+  { t: ["b", "b", "s", "b"].map(z => T("🐶", { size: z })), a: 2, rule: ["Three dogs are big.", "One is small."] },
+  { t: ["s", "s", "s", "b"].map(z => T("🐰", { size: z })), a: 3, rule: ["Three bunnies are small.", "One is big."] },
+  { t: [0, 0, 1, 0].map(f => T("🐠", { flip: !!f })), a: 2, rule: ["Three fish look this way.", "One looks the other way."] },
+  { t: ["red", "red", "blue", "red"].map(c => T("🐱", { collar: c })), a: 2, rule: ["Three cats have red collars.", "One has a blue collar."], hint: "Three are the same. Look at the collars." },
+  { t: [0, 1, 0, 0].map(f => T("🐴", { flip: !!f })), a: 1, rule: ["Three ponies look this way.", "One looks the other way."] },
+];
+const ODD_L5 = [
+  ["🦜🦆🦉🐶", 3, "Three have feathers.", "Parrot, duck and owl are birds.", "The dog is not a bird."],
+  ["🐠🐙🐳🐰", 3, "Where do they live?", "Fish, octopus and whale live in water.", "The bunny lives on land."],
+  ["🐶🐱🐰🦋", 3, "Three have soft fur.", "Dog, cat and bunny have fur.", "The butterfly has wings!"],
+  ["🐝🦋🦜🐴", 3, "Which can't fly?", "Bee, butterfly and parrot can fly.", "The pony can't."],
+  ["🦴🥕🍎🧸", 3, "Three are food.", "Bone, carrot and apple are food.", "The teddy is a toy."],
+  ["⚽🧶🎾🍎", 3, "Three are toys.", "Ball, yarn and tennis ball are toys.", "You eat an apple."],
+  ["🐮🐷🐑🐠", 3, "Three live on a farm.", "Cow, pig and sheep live on a farm.", "The fish lives in water."],
+  ["🐳🐬🐙🐦", 3, "Where do they live?", "Whale, dolphin and octopus live in the sea.", "The bird does not."],
+  ["🐭🐹🐰🐘", 3, "Think big and small.", "Mouse, hamster and bunny are small.", "The elephant is very big."],
+  ["🐶🐱🐰🦈", 3, "Which can be a pet at home?", "Dog, cat and bunny can be pets.", "A shark is not a pet."],
+  ["🦉🐧🦆🐝", 3, "Three have feathers.", "Owl, penguin and duck are birds.", "The bee is not a bird."],
+  ["🐔🦆🦉🦇", 3, "Feathers or fur?", "Chicken, duck and owl are birds.", "A bat can fly, but it is not a bird!"],
+  ["🦒🐘🦓🐹", 3, "Which one lives in a home?", "Giraffe, elephant and zebra live in the wild.", "A hamster is a pet."],
+  ["🐱🐯🦁🐶", 3, "Three are in the cat family.", "Cat, tiger and lion are all in the cat family.", "The dog is not."],
+].map(([s, a, hint, r1, r2]) => ({ t: E(s).map(e => T(e)), a, hint, rule: [r1, r2] }));
+const ODD_L5_LATE = [11, 13]; // items 12 and 14: only after 2 first-try odd-one-out answers this round
+
+/* ---- Who Am I? ---- */
+// Each clue: [text, icon, cards that fit it]
+const WHO_L6 = [
+  ["🐶🐱🦜🐠", "🐱", [["I have 4 legs.", "🦵", "🐶🐱"], ["I say meow.", "🔊", "🐱"]]],
+  ["🐰🐴🐹🦆", "🐰", [["I have 4 legs.", "🦵", "🐰🐴🐹"], ["I hop.", "⤴️", "🐰"]]],
+  ["🐠🐙🐶🦉", "🐙", [["I live in water.", "💧", "🐠🐙"], ["I have 8 arms.", "8️⃣", "🐙"]]],
+  ["🦜🦆🦉🐱", "🦆", [["I have feathers.", "FEATHER", "🦜🦆🦉"], ["I say quack.", "🔊", "🦆"]]],
+  ["🐴🐶🐹🦜", "🐴", [["I have 4 legs.", "🦵", "🐴🐶🐹"], ["People ride on me.", "🧒", "🐴"]]],
+  ["🐶🐱🐭🦜", "🐶", [["I have 4 legs.", "🦵", "🐶🐱🐭"], ["I bark.", "🔊", "🐶"]]],
+  ["🦉🦜🐝🐢", "🦉", [["I can fly.", "☁️", "🦉🦜🐝"], ["I say hoo-hoo at night.", "🌙", "🦉"]]],
+  ["🐠🐳🐶🐱", "🐳", [["I live in water.", "💧", "🐠🐳"], ["I am very, very big.", "📏", "🐳"]]],
+  ["🐝🦋🐞🐶", "🐝", [["I can fly.", "☁️", "🐝🦋🐞"], ["I make honey.", "🍯", "🐝"]]],
+  ["🐢🐌🐰🐠", "🐢", [["I have a shell.", "🐚", "🐢🐌"], ["I have 4 legs.", "🦵", "🐢🐰"]]],
+  ["🐹🐴🐮🦜", "🐹", [["I am small.", "📏", "🐹🦜"], ["I have fur.", "🧸", "🐹🐴🐮"]]],
+  ["🐧🦜🐠🐶", "🐧", [["I am a bird.", "FEATHER", "🐧🦜"], ["I swim but I can't fly.", "💧", "🐧🐠🐶"]]],
+];
+const WHO_L8 = [
+  ["🐶🐱🦜🐠", "🐱", [["I don't live in water.", "💧", "🐶🐱🦜"], ["I don't have feathers.", "FEATHER", "🐶🐱🐠"], ["I don't bark.", "🔊", "🐱🦜🐠"]]],
+  ["🐰🐹🦜🐴", "🐰", [["I have fur.", "🧸", "🐰🐹🐴"], ["I am small.", "📏", "🐰🐹🦜"], ["I have long ears.", "👂", "🐰"]]],
+  ["🦆🐧🦉🐝", "🦆", [["I have feathers.", "FEATHER", "🦆🐧🦉"], ["I can fly.", "☁️", "🦆🦉🐝"], ["I swim on ponds.", "💧", "🦆"]]],
+  ["🐢🐌🐠🐶", "🐢", [["I live on land.", "🌿", "🐢🐌🐶"], ["I have a shell.", "🐚", "🐢🐌"], ["I have legs.", "🦵", "🐢🐶"]]],
+  ["🐱🐴🐮🦜", "🐴", [["I have 4 legs.", "🦵", "🐱🐴🐮"], ["I am big.", "📏", "🐴🐮"], ["I say neigh.", "🔊", "🐴"]]],
+  ["🦋🐝🦜🐶", "🦋", [["I can fly.", "☁️", "🦋🐝🦜"], ["I am not a bird.", "FEATHER", "🦋🐝🐶"], ["I don't make honey.", "🍯", "🦋🦜🐶"]]],
+  ["🐧🦆🦉🦇", "🦉", [["I can fly.", "☁️", "🦆🦉🦇"], ["I am awake at night.", "🌙", "🦉🦇"], ["I have feathers.", "FEATHER", "🐧🦆🦉"]]],
+  ["🐙🐠🐳🐶", "🐙", [["I live in water.", "💧", "🐙🐠🐳"], ["I am not very big.", "📏", "🐙🐠🐶"], ["I have 8 arms.", "8️⃣", "🐙"]]],
+];
+
+/* ---- Pet Pens pools (checked facts) ---- */
+const POOL = {
+  fly: E("🦜🦆🦉🐝🦋🦇"), noFly: E("🐶🐱🐰🐹🐴🐠🐌🐧"),
+  water: E("🐠🐙🐳🐬🦈🐡"), land: E("🐶🐱🐰🐹🐴🐮🐭"),
+  legs2: E("🦜🦆🦉🐧🐔"), legs4: E("🐶🐱🐰🐹🐴🐮🐷🐭🐢"),
+  feathers: E("🦜🦆🦉🐧🐔"), fur: E("🐶🐱🐰🐹🐭🐴"),
+};
+// Never 🐹 with 🐭, or 🐶 with 🐺, in one item (they look too alike).
+const clash = list => (list.includes("🐹") && list.includes("🐭")) || (list.includes("🐶") && list.includes("🐺"));
+function pickPets(pool, n, avoid) {
+  for (let k = 0; k < 50; k++) { const s = shuffle(pool).slice(0, n); if (!clash(s.concat(avoid || []))) return s; }
+  return shuffle(pool).slice(0, n);
+}
+
+/* =====================================================================
+   GENERATORS — build one item's content
+   ===================================================================== */
+let R = null; // current round
+function pickIdx(key, n, ok) {
+  ok = ok || (() => true);
+  const used = R ? (R.used[key] = R.used[key] || []) : [];
+  let c = [];
+  for (let i = 0; i < n; i++) if (!used.includes(i) && ok(i)) c.push(i);
+  if (!c.length) { used.length = 0; for (let i = 0; i < n; i++) if (ok(i)) c.push(i); }
+  const i = pick(c); used.push(i); return i;
+}
+function memSize(it) {
+  const off = S.offset();
+  const delta = S.adaptive() && R ? R.adaptive.delta : 0;
+  const capN = it.t === "helper" ? 4 : 6;
+  const base = it.sz + off;
+  return clamp(Math.min(base + delta, base + 1), 2, capN);
+}
+function genPeek(span, baseSz) {
+  const table = { 2: 3, 3: 5, 4: 6, 5: 6 };
+  let n = span === baseSz && table[span] ? table[span] : span + 1;
+  n = Math.min(7, Math.max(span + 1, n));
+  const pool = poolFor(R ? R.level : 1, n);
+  const used = SESSION ? (SESSION.peekUsed = SESSION.peekUsed || []) : [];
+  const prev = SESSION && SESSION.lastPeek ? SESSION.lastPeek : null;
+  const firstAfterDemo = !!afterDemo.peek; afterDemo.peek = false;
+  let seq;
+  for (let k = 0; k < 50; k++) {
+    seq = shuffle(pool).slice(0, span); // distinct pets: no repeats inside a sequence
+    const key = seq.join("");
+    if (k === 49) break; // after 50 tries, accept
+    if (used.includes(key)) continue; // never the same ordered sequence twice in a session
+    if (key === "🐸🦆") continue; // the demo sequence
+    if (firstAfterDemo && (seq.includes("🐸") || seq.includes("🦆"))) continue;
+    if (prev) {
+      if (prev[0] === seq[0]) continue; // same first pet as the previous item
+      let same = 0; seq.forEach((e, i) => { if (prev[i] === e) same++; });
+      if (same > 1) continue; // more than one pet in the same place as last time
+    }
+    break;
+  }
+  if (SESSION) { used.push(seq.join("")); SESSION.lastPeek = seq.slice(); saveSession(); }
+  const dis = shuffle(pool.filter(p => !seq.includes(p))).slice(0, n - span);
+  let choices;
+  for (let k = 0; k < 30; k++) { // reshuffle if the answer is simply "tap across"
+    choices = shuffle(seq.concat(dis));
+    const idx = seq.map(e => choices.indexOf(e));
+    if (!idx.every((v, i) => i === 0 || v > idx[i - 1])) break;
+  }
+  return { seq, choices };
+}
+function genHide(nP, baseSz) {
+  const doors = nP <= 2 ? 4 : nP === 3 ? 6 : 9, cols = doors === 4 ? 2 : 3;
+  const pool = poolFor(R ? R.level : 1, nP);
+  const used = SESSION ? (SESSION.hideUsed = SESSION.hideUsed || []) : [];
+  let pets, idx, key;
+  for (let k = 0; k < 50; k++) {
+    pets = shuffle(pool).slice(0, nP);
+    do { idx = shuffle([...Array(doors).keys()]).slice(0, nP); } while (nP > 1 && new Set(idx.map(i => Math.floor(i / cols))).size === 1);
+    key = pets.map((p, i) => p + idx[i]).sort().join("|");
+    if (!used.includes(key)) break; // the same pets in the same doors never twice in a session
+  }
+  if (SESSION) { used.push(key); saveSession(); }
+  const pos = {}; pets.forEach((p, i) => { pos[p] = idx[i]; });
+  const ask = clamp(baseSz - 1, 1, nP);
+  let asks, tries = 0;
+  do { asks = shuffle(pets).slice(0, ask); tries++; } while (ask >= 2 && tries < 30 && asks.every((p, i) => i === 0 || pos[p] > pos[asks[i - 1]]));
+  return { pets, pos, asks, doors, cols };
+}
+function genHelper(n, level) {
+  const pets = (level === 4 && n <= 3) ? ["🐶", "🐱", "🐰"] : ["🐶", "🐱", "🐰", "🐴"];
+  let steps;
+  if (n === 2) steps = JOBS2[pickIdx("job2", JOBS2.length)];
+  else if (n === 3 && level !== 4) steps = JOBS3[pickIdx("job3", JOBS3.length)];
+  else { const ps = shuffle(pets).slice(0, n), ts = shuffle(TREATS).slice(0, n); steps = ps.map((p, i) => ({ pet: p, treat: ts[i] })); }
+  const shelfN = Math.min(6, Math.max(level === 4 ? 4 : 6, n + 2));
+  const extra = shuffle(TREATS.filter(t => !steps.some(s => s.treat === t))).slice(0, shelfN - n);
+  return { steps, shelf: shuffle(steps.map(s => s.treat).concat(extra)), pets };
+}
+const sameTile = (a, b) => !!a && !!b && a.e === b.e && (a.size || "") === (b.size || "") && !!a.flip === !!b.flip;
+function genNext(set) {
+  const bank = set === "L1" ? NEXT_L1 : set === "L3" ? NEXT_L3 : NEXT_T;
+  const item = bank[pickIdx("next" + set, bank.length)];
+  const q = item.t.indexOf("?");
+  const full = item.t.map(x => (x === "?" ? item.a : x));
+  let p = 1; // the repeating unit = the smallest period of the full row
+  for (; p < full.length; p++) { let ok = true; for (let i = p; i < full.length; i++) if (!sameTile(full[i], full[i - p])) { ok = false; break; } if (ok) break; }
+  let choices;
+  if (item.kind === "size") choices = ["s", "m", "b"].map(z => T(item.a.e, { size: z }));
+  else if (item.kind === "facing") choices = [T(item.a.e, { flip: false }), T(item.a.e, { flip: true }), T(pick(PEEK_POOL.filter(e => e !== item.a.e)))];
+  else {
+    const members = [...new Set(full.map(t => t.e))];
+    const other = pick(members.filter(e => e !== item.a.e));
+    const dis = pick(PEEK_POOL.filter(e => !members.includes(e)));
+    choices = [T(item.a.e), T(other), T(dis)];
+  }
+  return { tiles: item.t, full, q, ans: item.a, unit: p, choices: shuffle(choices), kind: item.kind || "" };
+}
+function genOdd(set) {
+  let item, hint;
+  if (set === "L2") { item = ODD_L2[pickIdx("oddL2", ODD_L2.length)]; hint = item.hint || L2HINT; }
+  else { item = ODD_L5[pickIdx("oddL5", ODD_L5.length, i => !ODD_L5_LATE.includes(i) || (R && R.oddFT >= 2))]; hint = item.hint; }
+  const tiles = item.t.map((t, i) => Object.assign({}, t, { ans: i === item.a }));
+  const sh = shuffle(tiles);
+  return { tiles: sh, ansIdx: sh.findIndex(t => t.ans), hint, rule: item.rule };
+}
+function genWho(set) {
+  const bank = set === "L8" ? WHO_L8 : WHO_L6;
+  const [cs, ans, clues] = bank[pickIdx("who" + set, bank.length)];
+  return {
+    cards: shuffle(E(cs)), ans,
+    clues: clues.map(([text, icon, fits]) => ({ text, icon: icon === "FEATHER" ? EM.feather : icon, fits: E(fits) })),
+  };
+}
+const A = e => `${capFirst(art(nm(e)))} ${nm(e)}`;
+function genPens(set, forceRule) {
+  if (set === "L8") {
+    const fur = pickPets(E("🐶🐱🐰🐹"), 2), fea = pickPets(POOL.feathers, 2);
+    const pets = shuffle([
+      ...fur.map(e => ({ t: T(e), pen: "house", fact: `${A(e)} has fur.` })),
+      ...fea.map(e => ({ t: T(e), pen: "nest", fact: `${A(e)} has feathers.` })),
+      { t: T("🐠"), pen: "pond", fact: "A fish lives in the pond." }, { t: T("🐡"), pen: "pond", fact: "A puffer fish is a fish." },
+    ]);
+    return {
+      pens: [{ key: "house", se: "🏠", word: "fur" }, { key: "nest", se: EM.nest, word: "feathers" }, { key: "pond", se: "💧", word: "fish" }],
+      pets, say: "Furry pets go in the house. Feathers go in the nest. Fish go in the pond.",
+    };
+  }
+  if (set === "L4") {
+    const rules = ["collar", "size", "kind", "fishbird"];
+    const rule = forceRule || rules[pickIdx("pensL4", rules.length)];
+    if (rule === "collar") {
+      const es = pickPets(PEEK_POOL, 4), cols = shuffle(["red", "red", "blue", "blue"]);
+      return {
+        pens: [{ key: "red", dot: "red", word: "red collar" }, { key: "blue", dot: "blue", word: "blue collar" }],
+        pets: es.map((e, i) => ({ t: T(e, { collar: cols[i] }), pen: cols[i], fact: `This ${nm(e)} has a ${cols[i]} collar.` })),
+        say: "Put each pet in the right pen. Red collar or blue collar?",
+      };
+    }
+    if (rule === "size") {
+      const [a, b] = shuffle(["🐶", "🐱", "🐰", "🐹", "🐴", "🐢"]).slice(0, 2);
+      const pets = shuffle([[a, "b"], [a, "s"], [b, "b"], [b, "s"]]).map(([e, z]) => ({ t: T(e, { size: z }), pen: z, fact: `This ${nm(e)} is ${z === "b" ? "big" : "small"}.` }));
+      return { pens: [{ key: "b", se: "🔼", word: "big" }, { key: "s", se: "🔽", word: "small" }], pets, say: "Put each pet in the right pen. Big or small?" };
+    }
+    if (rule === "kind") {
+      const pets = shuffle([["🐶", "b"], ["🐶", "s"], ["🐱", "b"], ["🐱", "s"]]).map(([e, z]) => ({ t: T(e, { size: z }), pen: e, fact: `This is ${art(nm(e))} ${nm(e)}.` }));
+      return { pens: [{ key: "🐶", se: "🐶", word: "dogs" }, { key: "🐱", se: "🐱", word: "cats" }], pets, say: "Put each pet in the right pen. Dogs or cats?" };
+    }
+    const pets = shuffle([["🐠", "b"], ["🐠", "s"], ["🦜", "b"], ["🦜", "s"]]).map(([e, z]) => ({ t: T(e, { size: z }), pen: e === "🐠" ? "fish" : "bird", fact: e === "🐠" ? "This is a fish." : "A parrot is a bird." }));
+    return { pens: [{ key: "fish", se: "💧", word: "fish" }, { key: "bird", se: "🌳", word: "birds" }], pets, say: "Put each pet in the right pen. Fish or birds?" };
+  }
+  // L7: rules from what she knows, 6 pets, 3 per pen
+  const R7 = [
+    { a: "fly", b: "noFly", pens: [{ key: "a", se: "🌳", word: "can fly" }, { key: "b", se: "🏠", word: "can't fly" }], fa: "can fly.", fb: "can't fly.", say: "Put each pet in the right pen. Can it fly?" },
+    { a: "water", b: "land", pens: [{ key: "a", se: "💧", word: "lives in water" }, { key: "b", se: "🌿", word: "lives on land" }], fa: "lives in water.", fb: "lives on land.", say: "Put each pet in the right pen. Water or land?" },
+    { a: "legs2", b: "legs4", pens: [{ key: "a", se: "🦵🦵", word: "2 legs" }, { key: "b", se: "🦵🦵🦵🦵", word: "4 legs" }], fa: "has 2 legs.", fb: "has 4 legs.", say: "Put each pet in the right pen. 2 legs or 4 legs?" },
+    { a: "feathers", b: "fur", pens: [{ key: "a", se: EM.feather, word: "feathers" }, { key: "b", se: "🧸", word: "fur" }], fa: "has feathers.", fb: "has fur.", say: "Put each pet in the right pen. Feathers or fur?" },
+  ];
+  const r = R7[pickIdx("pensL7", R7.length)];
+  const ga = pickPets(POOL[r.a], 3), gb = pickPets(POOL[r.b].filter(e => !ga.includes(e)), 3, ga);
+  const pets = shuffle([...ga.map(e => ({ t: T(e), pen: "a", fact: `${A(e)} ${r.fa}` })), ...gb.map(e => ({ t: T(e), pen: "b", fact: `${A(e)} ${r.fb}` }))]);
+  return { pens: r.pens, pets, say: r.say };
+}
+function tileName(t, kind) {
+  // facing patterns are spoken as "this way" / "the other way", never left/right
+  if (kind === "facing") return t.flip ? "the other way" : "this way";
+  const base = nm(t.e);
+  if (t.size) return `${{ s: "small", m: "medium", b: "big" }[t.size]} ${base}`;
+  return base;
+}
+function tileLabel(t) {
+  let s = tileName(t);
+  if (t.flip) s += ", the other way";
+  if (t.collar) s += `, ${t.collar} collar`;
+  return s;
+}
+function petSpan(t) {
+  const s = el("span", { class: "em" + (t.size ? " sz-" + t.size : "") + (t.flip ? " flip" : ""), "aria-hidden": "true" }, t.e);
+  if (t.collar) return el("span", { class: "cw" }, s, el("span", { class: "collar " + t.collar }));
+  return s;
+}
+
+/* =====================================================================
+   PLAY FRAME (3.0) + FEEDBACK ENGINE (3.11)
+   ===================================================================== */
+const app = document.getElementById("app");
+let F = null; // play frame refs
+function screen(cls, lockScroll) {
+  bump();
+  document.body.className = lockScroll ? "lock" : "";
+  app.innerHTML = "";
+  F = null;
+  const s = el("div", { class: cls });
+  app.append(s);
+  try { window.scrollTo(0, 0); } catch (e) {}
+  return s;
+}
+function buildPlay() {
+  const s = screen("play", true);
+  const homes = el("button", { class: "ghost", "aria-label": "Back to the pet homes" }, "⬅ Homes");
+  const paws = el("div", { class: "paws", role: "list", "aria-label": "Round progress" });
+  const btext = el("span", { class: "btext" });
+  const chip = el("span", { class: "askchip", "aria-hidden": "true" });
+  const bubble = el("div", { class: "bubble" }, btext, chip);
+  const pip = el("button", { class: "pipface", "aria-label": "Pip the puppy" }, "🐶");
+  const hear = el("button", { class: "btn sky hearbtn", "aria-label": "Hear it again", style: "visibility:hidden" }, "🔊");
+  const stage = el("div", { class: "stage" }), answer = el("div", { class: "answer" });
+  const main = el("div", { class: "main" }, stage, answer);
+  s.append(el("div", { class: "topbar" }, homes, paws), el("div", { class: "piprow" }, bubble, pip, hear), main);
+  F = { play: s, homes, paws, bubble, btext, chip, pip, hear, main, stage, answer, hearFn: null };
+  homes.onclick = () => { if (R) { R.savedAt = Date.now(); saveRound(); } home(); };
+  pip.onclick = () => { if (RM()) return; pip.classList.remove("wag"); void pip.offsetWidth; pip.classList.add("wag"); };
+  hear.onclick = () => { if (F && F.hearFn) F.hearFn(); };
+}
+function setHear(fn) {
+  if (!F) return;
+  F.hearFn = fn || null;
+  F.hear.style.visibility = fn && Voice.on() ? "visible" : "hidden";
+}
+function clearArea() {
+  if (!F) return;
+  F.stage.innerHTML = ""; F.answer.innerHTML = ""; F.main.classList.remove("col");
+  $$(".skipper,.demoveil,.skipbtn,.dhand", F.play).forEach(x => x.remove());
+  setHear(null); bubble("");
+}
+function bubble(text, hmm) {
+  if (!F) return;
+  F.bubble.classList.toggle("hmm", !!hmm);
+  F.btext.textContent = text; F.chip.textContent = "";
+}
+function renderPaws(popIdx) {
+  if (!F || !R) return;
+  const N = R.plan.length;
+  F.paws.innerHTML = "";
+  for (let i = 0; i < N; i++) {
+    const r = R.results[i];
+    const cls = r ? (r === "first" ? "gold" : "plain") : (i === R.idx ? "cur" : "");
+    const p = el("div", { class: "paw " + cls + (i === popIdx && !RM() ? " pawpop" : ""), role: "listitem", "aria-label": `Paw ${i + 1} of ${N}` }, el("span", { "aria-hidden": "true" }, "🐾"));
+    F.paws.append(p);
+  }
+}
+const PRAISE = {
+  peek: ["You remembered all {n}!", "In the right order, too!"],
+  hide: ["Great looking!", "You remembered all {n}!"],
+  helper: ["You listened to every step!"],
+  next: ["Pattern power!"],
+  odd: ["You found the rule!"],
+  pens: ["You found the rule!"],
+  who: ["You checked every clue!"],
+  any: ["Your pets are proud of you!", "Great looking!"],
+};
+let praiseI = 0, secondI = 0;
+const SECOND = ["You got it!", "Yes! That's it!", "Well done, you checked again!"]; // after a hint (plain paw)
+function praise(t, n) { const list = PRAISE[t].concat(PRAISE.any); return list[praiseI++ % list.length].replace("{n}", n || ""); }
+
+function makeCtx(item, demo, onDone) {
+  const ctx = {
+    item, demo, misses: 0, shown: false, phase: "idle", finished: false, gen: GEN,
+    stage: F.stage, answer: F.answer, content: null, span: 0,
+    bubble(text, hmm) { bubble(text, hmm); },
+    say(text, opts) {
+      opts = opts || {}; bubble(opts.show || text, opts.hmm);
+      const sp = Voice.say(opts.speak || text, opts);
+      // with voice off, keep a hint line readable for a moment before the next step replaces it
+      return live(opts.hmm && !Voice.on() ? Promise.all([sp, new Promise(r => setTimeout(r, 1800))]) : sp);
+    },
+    setHear(fn) { setHear(fn); },
+    logErr(kind) { if (demo) return; const a = P.activity[item.t]; if (kind === "order") a.orderErr++; else a.itemErr++; saveP(); },
+    miss() { this.misses++; Sound.play("hmm"); if (this.misses >= 2) { this.shown = true; return "show"; } return "hint"; },
+    result() { return this.shown ? "shown" : this.misses ? "second" : "first"; },
+    // Right answer / end of item: praise, then advance when Pip finishes or
+    // after 1.2 s, whichever is later (capped). A tap skips the wait.
+    async complete(o) {
+      o = o || {};
+      if (this.finished) return; this.finished = true; this.phase = "done";
+      const res = this.result(); setHear(null);
+      if (!demo && R) { R.results[R.idx] = res; renderPaws(R.idx); }
+      Sound.play(res === "shown" ? "pop" : "chime");
+      const pr = res === "second" ? SECOND[secondI++ % SECOND.length] : (o.praise || "Yes!");
+      const speech = typeof o.speech === "function" ? o.speech(pr) : (res === "first" && o.speech) || pr;
+      bubble(res === "shown" ? "Now you know it!" : pr);
+      const talk = (async () => {
+        if (res === "shown") await live(Voice.say("Now you know it!"));
+        else if (o.first) await live(Voice.say(o.first));
+        if (o.during) await o.during();
+        else if (res !== "shown") await live(Voice.say(speech, { queue: !!o.first }));
+      })();
+      let skipEl = null;
+      const skip = new Promise(r => {
+        if (demo) return;
+        skipEl = el("div", { class: "skipper", "aria-hidden": "true" });
+        skipEl.addEventListener("click", () => { Voice.cancel(); r(); });
+        F.play.append(skipEl);
+      });
+      await live(Promise.race([Promise.all([talk, sleep(1200)]), sleep(o.cap || 4000), skip]));
+      if (skipEl) skipEl.remove();
+      onDone(res, ctx);
+    },
+  };
+  return ctx;
+}
+
+/* =====================================================================
+   ACTIVITIES
+   ===================================================================== */
+const ACT = {};
+
+/* ---- M1 Who Peeked? ---- */
+ACT.peek = ctx => {
+  const { seq, choices } = ctx.content, n = seq.length;
+  const pet = el("span", { class: "peekpet", "aria-hidden": "true" });
+  const lab = el("div", { class: "peeklabel" });
+  const door = el("div", { class: "burrow" }, el("div", { class: "burrow-in" }, pet));
+  const ready = el("button", { class: "btn pop ready" }, "Ready? 👀");
+  ctx.stage.append(door, lab, ready);
+  const slots = el("div", { class: "slots", hidden: true });
+  const slotEls = seq.map((_, i) => el("div", { class: "slot", "aria-label": `Spot ${i + 1}` }, el("b", null, String(i + 1)), el("span", { class: "sp" })));
+  slots.append(...slotEls);
+  const btns = choices.map(e => el("button", { class: "tile choice", "aria-label": nm(e), "data-e": e }, el("span", { class: "em", "aria-hidden": "true" }, e), S.labels() ? el("small", null, nm(e)) : null));
+  const row = el("div", { class: "choices" + (choices.length >= 7 ? " many" : "") }, ...btns);
+  ctx.answer.append(slots, row);
+  lock(btns, true);
+  const byE = e => btns.find(b => b.dataset.e === e);
+  let filled = 0, answered = false;
+  ctx.span = n;
+  ctx.phase = "ready";
+  ctx.say("Tap Ready, then watch the pets!");
+  async function show(ms, glowing) {
+    lock(btns, true); door.classList.remove("small");
+    for (let i = 0; i < n; i++) {
+      pet.textContent = seq[i]; pet.classList.remove("in"); void pet.offsetWidth; if (!RM()) pet.classList.add("in");
+      lab.textContent = S.labels() ? nm(seq[i]) : "";
+      Sound.play("pop"); Voice.say(nm(seq[i]));
+      if (glowing) { byE(seq[i]).classList.add("peekglow"); slotEls[i].classList.add("peekglow"); }
+      await sleep(ms);
+      pet.textContent = ""; lab.textContent = "";
+      if (glowing) { byE(seq[i]).classList.remove("peekglow"); slotEls[i].classList.remove("peekglow"); }
+      await sleep(400);
+    }
+  }
+  function answerPhase() {
+    door.classList.add("small"); slots.hidden = false; ctx.phase = "answer";
+    lock(btns.filter(b => !b.classList.contains("used") && !b.classList.contains("gone")), false);
+    ctx.say("Your turn! Tap them in order.");
+    if (S.replay() && !answered) ctx.setHear(async () => {
+      if (ctx.phase !== "answer" || answered) return;
+      ctx.phase = "showing"; ctx.setHear(null); ctx.bubble("Watch… 👀");
+      await show(PACE_MS()); answerPhase();
+    });
+  }
+  ready.onclick = async () => {
+    if (ctx.phase !== "ready") return;
+    ready.remove(); ctx.phase = "showing"; ctx.bubble("Watch… 👀"); Voice.cancel();
+    await sleep(350); await show(PACE_MS()); answerPhase();
+  };
+  btns.forEach(b => b.addEventListener("click", () => tap(b)));
+  async function tap(b) {
+    if (!(ctx.phase === "answer" || ctx.phase === "showme") || b.hasAttribute("inert")) return;
+    if (dbl(b)) return;
+    if (!answered) { answered = true; ctx.setHear(null); }
+    const e = b.dataset.e;
+    if (e === seq[filled]) {
+      const i = filled++;
+      unglow(b); b.classList.add("used"); setInert(b, true, true); Sound.play("pop");
+      fly(b.querySelector(".em"), slotEls[i], e, () => { const sp = slotEls[i].querySelector(".sp"); sp.textContent = e; if (!RM()) sp.classList.add("in"); slotEls[i].classList.add("filled"); });
+      if (filled === n) { ctx.phase = "done"; await sleep(300); ctx.complete({ praise: praise("peek", n) }); return; }
+      if (ctx.phase === "showme") glow(byE(seq[filled]));
+      return;
+    }
+    if (ctx.phase === "showme") return;
+    const order = seq.includes(e);
+    ctx.logErr(order ? "order" : "item");
+    if (order) wobble(b, false); else { wobble(b, true); b.classList.add("gone"); setInert(b, true); }
+    const step = ctx.miss();
+    ctx.phase = "showing"; lock(btns, true);
+    if (step === "hint") {
+      await ctx.say(order ? "That pet was there! Which one came next?" : "Let's watch again.", { hmm: true, speak: order ? "That pet was there! Which one came next? Watch again." : "Let's watch again." });
+      await sleep(300); ctx.bubble("Watch… 👀", true);
+      await show(1600);
+      answerPhase();
+    } else {
+      await ctx.say("Let's do it together. Tap the glowing one.");
+      await show(PACE_MS(), true);
+      door.classList.add("small"); ctx.phase = "showme";
+      ctx.bubble("Tap the glowing one.");
+      glow(byE(seq[filled]));
+    }
+  }
+};
+
+/* ---- M2 Hide and Seek ---- */
+const DOORC = ["#F9A8D4", "#FDE68A", "#A7F3D0", "#BFDBFE", "#DDD6FE", "#FECACA", "#FED7AA", "#BBF7D0", "#E9D5FF"];
+ACT.hide = ctx => {
+  const { pets, pos, asks, doors, cols } = ctx.content;
+  const dsz = doors === 4 ? "clamp(110px, 19dvh, 220px)" : doors === 6 ? "clamp(100px, 17dvh, 200px)" : "clamp(88px, 14.5dvh, 176px)";
+  const occupant = Array(doors).fill(null); pets.forEach(p => { occupant[pos[p]] = p; });
+  const dEls = occupant.map((p, i) => el("button", { class: "door", "aria-label": `Door ${i + 1}`, "data-i": i, style: `--dc:${DOORC[i]}` },
+    el("div", { class: "room" }, p ? el("span", { class: "em", "aria-hidden": "true" }, p) : el("span", { class: "em flower", "aria-hidden": "true" }, "🌼"), p && S.labels() ? el("small", null, nm(p)) : null),
+    el("div", { class: "leafp" }, el("span", { class: "knob" }))));
+  const grid = el("div", { class: "doors", style: `grid-template-columns:repeat(${cols}, auto);--dsz:${dsz}` }, ...dEls);
+  const ready = el("button", { class: "btn pop ready" }, "Ready? 👀");
+  ctx.stage.append(grid); ctx.answer.append(ready);
+  lock(dEls, true, true);
+  const found = new Set();
+  let q = 0, qMiss = 0, answered = false;
+  const openMs = (1500 + 1000 * pets.length) * PACE_MULT();
+  ctx.span = pets.length;
+  ctx.phase = "ready";
+  ctx.say("Tap Ready, then look where pets hide.");
+  const setOpen = (d, o) => d.classList.toggle("open", o);
+  async function peekAll(ms) {
+    lock(dEls, true, true);
+    dEls.forEach((d, i) => { if (!found.has(i)) setOpen(d, true); });
+    Sound.play("pop");
+    await sleep(ms);
+    dEls.forEach((d, i) => { if (!found.has(i)) setOpen(d, false); });
+    Sound.play("click");
+    await sleep(250);
+  }
+  const askText = () => (q === 0 ? `Where is the ${nm(asks[q])}?` : `Now, where is the ${nm(asks[q])}?`);
+  function ask(keepDims) {
+    if (!keepDims) { qMiss = 0; dEls.forEach(d => d.classList.remove("dim")); }
+    dEls.forEach((d, i) => setInert(d, found.has(i) || d.classList.contains("dim"), true));
+    ctx.phase = "answer";
+    ctx.say(askText()); F.chip.textContent = asks[q];
+    if (S.replay() && !answered) ctx.setHear(async () => {
+      if (ctx.phase !== "answer" || answered) return;
+      ctx.phase = "showing"; ctx.setHear(null); ctx.bubble("Look… 👀");
+      await peekAll(openMs); ask(true);
+    });
+  }
+  ready.onclick = async () => {
+    if (ctx.phase !== "ready") return;
+    ready.remove(); ctx.phase = "showing"; ctx.bubble("Look… 👀"); Voice.cancel();
+    await sleep(250); await peekAll(openMs); ask();
+  };
+  dEls.forEach((d, i) => d.addEventListener("click", () => tapDoor(d, i)));
+  async function tapDoor(d, i) {
+    if (!(ctx.phase === "answer" || ctx.phase === "showme") || d.hasAttribute("inert")) return;
+    if (dbl(d)) return;
+    answered = true; ctx.setHear(null);
+    const target = pos[asks[q]];
+    if (i === target) {
+      found.add(i); unglow(d); setOpen(d, true); d.classList.remove("dim"); d.classList.add("right"); setInert(d, true, true);
+      Sound.play("pop"); hop(d.querySelector(".room .em"));
+      q++;
+      if (q >= asks.length) { ctx.phase = "done"; await sleep(350); ctx.complete({ praise: praise("hide", asks.length) }); return; }
+      ctx.phase = "between"; ctx.bubble("Yes!"); Voice.say("Yes!");
+      await sleep(900); ask(); return;
+    }
+    if (ctx.phase === "showme") return;
+    ctx.logErr("item"); shake(d); d.classList.add("dim"); setInert(d, true, true);
+    qMiss++; ctx.misses++; Sound.play("hmm");
+    ctx.phase = "showing";
+    if (qMiss === 1) {
+      await ctx.say("Let's peek again.", { hmm: true });
+      await peekAll(openMs / 2);
+      ask(true);
+    } else {
+      ctx.shown = true; lock(dEls, true, true);
+      await ctx.say("Let's do it together. Tap the glowing one.");
+      const td = dEls[target];
+      setOpen(td, true); Sound.play("pop"); await sleep(1500); setOpen(td, false); Sound.play("click"); await sleep(250);
+      dEls.forEach((dd, j) => { if (j !== target && !found.has(j)) dd.classList.add("dim"); });
+      ctx.phase = "showme"; ctx.bubble("Tap the glowing door."); F.chip.textContent = asks[q];
+      glow(td);
+    }
+  }
+};
+
+/* ---- M3 Pet Helper ---- */
+ACT.helper = ctx => {
+  const { steps, shelf, pets } = ctx.content, n = steps.length;
+  const lab = i => (i === 0 ? "First" : i === n - 1 ? (n === 2 ? "Then" : "Last") : "Then");
+  const stepText = i => `${lab(i)}, give the ${nm(steps[i].pet)} ${TREAT_SAY[steps[i].treat]}.`;
+  const stepEls = steps.map((s, i) => el("div", { class: "step" }, el("div", { class: "pair", "aria-label": stepText(i) }, `${s.treat} ➜ ${s.pet}`), el("div", { class: "lab" }, lab(i))));
+  const strip = el("div", { class: "strip", hidden: true }, ...stepEls);
+  const tEls = shelf.map(t => el("button", { class: "tile treat", "aria-label": TREAT[t], "data-e": t }, el("span", { class: "em", "aria-hidden": "true" }, t)));
+  const shelfEl = el("div", { class: "shelf" }, ...tEls);
+  const pEls = pets.map(p => el("button", { class: "tile petcard", "aria-label": nm(p), "data-e": p }, el("span", { class: "badges", "aria-hidden": "true" }), el("span", { class: "em", "aria-hidden": "true" }, p), el("small", null, nm(p))));
+  const pcs = el("div", { class: "petcards" }, ...pEls);
+  const ready = el("button", { class: "btn pop ready" }, "Ready? 👀");
+  ctx.stage.append(strip, shelfEl); ctx.answer.append(pcs, ready);
+  lock(tEls, true); lock(pEls, true);
+  let done = 0, sel = null, answered = false;
+  ctx.span = n;
+  ctx.phase = "ready";
+  ctx.say("Tap Ready, then listen to the job.");
+  async function readJob() {
+    strip.hidden = false; ctx.bubble("Listen… 👂");
+    for (let i = 0; i < n; i++) {
+      stepEls[i].classList.add("lit");
+      await live(Voice.say(stepText(i), { wait: true, queue: i > 0 }));
+      stepEls[i].classList.remove("lit");
+    }
+    await sleep(300); strip.hidden = true;
+  }
+  function unlockAvail() { tEls.forEach(t => setInert(t, t.classList.contains("spent"), t.classList.contains("spent"))); lock(pEls, false); }
+  function answerPhase() {
+    ctx.phase = "answer"; unlockAvail(); ctx.say("Your turn!");
+    if (S.replay() && !answered) ctx.setHear(async () => {
+      if (ctx.phase !== "answer" || answered) return;
+      ctx.phase = "showing"; ctx.setHear(null); lock(tEls, true); lock(pEls, true);
+      await readJob(); answerPhase();
+    });
+  }
+  ready.onclick = async () => {
+    if (ctx.phase !== "ready") return;
+    ready.remove(); ctx.phase = "showing"; Voice.cancel();
+    await readJob(); answerPhase();
+  };
+  function select(t) { if (sel) sel.classList.remove("sel"); sel = t; if (t) t.classList.add("sel"); pcs.classList.toggle("target", !!t); }
+  const tFor = e => tEls.find(t => t.dataset.e === e), pFor = e => pEls.find(p => p.dataset.e === e);
+  tEls.forEach(t => {
+    t.addEventListener("click", () => {
+      if (recentDrag(t)) return;
+      if (!(ctx.phase === "answer" || ctx.phase === "showme") || t.hasAttribute("inert")) return;
+      if (!answered) { answered = true; ctx.setHear(null); }
+      if (sel === t) { if (ctx.phase !== "showme") select(null); return; }
+      select(t);
+      if (ctx.phase === "showme") { unglow(t); glow(pFor(steps[done].pet)); }
+    });
+    draggable(t, () => pEls, zone => {
+      if (!(ctx.phase === "answer" || ctx.phase === "showme")) return;
+      if (!answered) { answered = true; ctx.setHear(null); }
+      if (!zone) { select(null); if (ctx.phase === "showme") showStep(); return; }
+      select(t); attempt(t, zone);
+    }, () => ctx.phase === "answer" || ctx.phase === "showme");
+  });
+  pEls.forEach(p => p.addEventListener("click", () => {
+    if (!(ctx.phase === "answer" || ctx.phase === "showme") || p.hasAttribute("inert")) return;
+    if (!sel) { hop(p); return; }
+    attempt(sel, p);
+  }));
+  async function attempt(t, p) {
+    if (dbl(p)) return;
+    const exp = steps[done];
+    if (t.dataset.e === exp.treat && p.dataset.e === exp.pet) {
+      select(null); unglow(p); unglow(t);
+      t.classList.add("spent"); setInert(t, true, true);
+      p.querySelector(".badges").append(el("span", null, t.dataset.e)); hop(p); Sound.play("pop");
+      stepEls[done].classList.remove("lit"); stepEls[done].classList.add("ok");
+      done++;
+      if (done === n) { ctx.phase = "done"; await sleep(300); ctx.complete({ praise: praise("helper", n) }); return; }
+      if (ctx.phase === "showme") showStep();
+      return;
+    }
+    select(null); wobble(t);
+    if (ctx.phase === "showme") { showStep(); return; }
+    const laterStep = steps.slice(done + 1).some(s => s.treat === t.dataset.e && s.pet === p.dataset.e);
+    ctx.logErr(laterStep ? "order" : "item");
+    const step = ctx.miss();
+    ctx.phase = "showing"; lock(tEls, true); lock(pEls, true);
+    if (step === "hint") { await ctx.say(laterStep ? "That job comes later! Listen again." : "Listen again.", { hmm: true }); await readJob(); answerPhase(); }
+    else { ctx.phase = "showme"; showStep(true); } // glow at once, while Pip talks
+  }
+  function showStep(lead) {
+    strip.hidden = false;
+    stepEls.forEach((s, i) => s.classList.toggle("lit", i === done));
+    tEls.forEach(t => { unglow(t); setInert(t, true, t.classList.contains("spent")); });
+    pEls.forEach(p => { unglow(p); setInert(p, true); });
+    ctx.bubble(lead ? "Let's do it together. Tap the glowing one." : stepText(done));
+    Voice.say((lead ? "Let's do it together. " : "") + stepText(done));
+    glow(tFor(steps[done].treat));
+  }
+};
+
+/* ---- L1 What Comes Next? / Tricky Patterns ---- */
+ACT.next = ctx => {
+  const it = ctx.content, n = it.tiles.length;
+  F.main.classList.add("col");
+  const box = el("div", { class: "prow" });
+  ctx.stage.append(box);
+  const nameOf = t => tileName(t, it.kind);
+  const tileEls = it.tiles.map(t => (t === "?" ? el("div", { class: "ptile q", "aria-label": "missing pet" }, el("span", { class: "qm" }, "?"))
+    : el("div", { class: "ptile", role: "img", "aria-label": tileLabel(t) }, petSpan(t))));
+  let lastW = 0, bracketsOn = false;
+  // Tile size from the real width of the play area (not the empty stage). Keep one line
+  // whenever tiles can stay >= 52px; only very narrow screens wrap, at a repeat boundary.
+  function layoutRow(force) {
+    const W = Math.max(260, (F.main.clientWidth || 760) - 72);
+    if (!force && Math.abs(W - lastW) < 2) return;
+    lastW = W;
+    let per = n, ts = Math.min(88, (W - 8 * (n - 1)) / n);
+    if (ts < 52) { per = Math.max(it.unit, Math.floor((W + 8) / 60)); per -= per % it.unit; per = Math.max(it.unit, per); ts = Math.min(88, (W - 8 * (per - 1)) / per); }
+    ts = Math.max(48, Math.floor(ts));
+    box.innerHTML = "";
+    let line = null;
+    tileEls.forEach((te, i) => {
+      if (i % per === 0) { line = el("div", { class: "pline", style: `--ts:${ts}px` }); box.append(line); }
+      te._line = line; line.append(te);
+    });
+    if (bracketsOn) drawBrackets();
+  }
+  layoutRow(true);
+  const onResize = () => { if (!box.isConnected) { window.removeEventListener("resize", onResize); return; } requestAnimationFrame(() => layoutRow()); };
+  window.addEventListener("resize", onResize);
+  const cEls = it.choices.map(c => el("button", { class: "tile pchoice", "aria-label": tileLabel(c), "data-ok": sameTile(c, it.ans) ? "1" : null }, petSpan(c)));
+  ctx.answer.append(el("div", { class: "choices" }, ...cEls));
+  const instr = it.q === n - 1 ? "What comes next?" : "What is missing?";
+  ctx.phase = "answer";
+  ctx.say(instr);
+  ctx.setHear(() => ctx.say(instr, { hmm: F.bubble.classList.contains("hmm") }));
+  async function rhythm() {
+    for (let i = 0; i < n; i++) {
+      tileEls[i].classList.add("lit");
+      if (Voice.on()) await live(Voice.say(nameOf(it.full[i]) + (i === n - 1 ? "!" : ","), { queue: true })); else await sleep(450);
+      tileEls[i].classList.remove("lit");
+    }
+  }
+  let hrTok = 0;
+  const stopHint = () => { hrTok++; tileEls.forEach(t => t.classList.remove("lit")); };
+  async function hintRead() {
+    const my = ++hrTok;
+    for (let i = 0; i < n; i++) {
+      if (my !== hrTok) return;
+      tileEls[i].classList.add("lit");
+      const word = i === it.q ? "what?" : nameOf(it.full[i]) + ((i + 1) % it.unit === 0 ? "…" : ",");
+      if (Voice.on()) await live(Voice.say(word, { queue: true })); else await sleep(450);
+      tileEls[i].classList.remove("lit");
+      if ((i + 1) % it.unit === 0) await sleep(250);
+    }
+    if (my === hrTok) await live(Voice.say(instr, { queue: true }));
+  }
+  function drawBrackets() {
+    bracketsOn = true;
+    for (let k = 0; (k + 1) * it.unit <= n; k++) {
+      const a = k * it.unit, b = a + it.unit - 1;
+      let ok = true; for (let i = a; i <= b; i++) if (i === it.q) ok = false;
+      if (!ok || tileEls[a]._line !== tileEls[b]._line) continue;
+      const left = tileEls[a].offsetLeft, right = tileEls[b].offsetLeft + tileEls[b].offsetWidth;
+      tileEls[a]._line.append(el("div", { class: "bracket", style: `left:${left}px;width:${right - left}px` }));
+    }
+  }
+  cEls.forEach((b, i) => b.addEventListener("click", async () => {
+    if (!(ctx.phase === "answer" || ctx.phase === "showme") || b.hasAttribute("inert")) return;
+    if (dbl(b)) return;
+    const c = it.choices[i];
+    if (sameTile(c, it.ans)) {
+      ctx.phase = "done"; stopHint(); unglow(b); b.classList.add("right"); lock(cEls.filter(x => x !== b), true, true);
+      const qt = tileEls[it.q];
+      fly(b.querySelector(".em"), qt, c.e, () => {});
+      qt.innerHTML = ""; qt.append(petSpan(c)); qt.classList.add("solved"); qt.setAttribute("aria-label", tileLabel(c));
+      ctx.complete({ praise: praise("next"), first: "Yes!", during: rhythm, cap: 12000 });
+      return;
+    }
+    if (ctx.phase === "showme") return;
+    ctx.logErr("item"); wobble(b, true); setInert(b, true);
+    const step = ctx.miss();
+    if (step === "hint") {
+      ctx.phase = "answer"; drawBrackets(); ctx.bubble(instr, true); Voice.cancel(); hintRead();
+    } else {
+      ctx.phase = "showme"; stopHint(); lock(cEls, true);
+      const unitNames = it.full.slice(0, it.unit).map(nameOf).join(", ");
+      ctx.say(`The pattern is ${unitNames}.`, { speak: `The pattern is ${unitNames}. So it is ${nameOf(it.ans)}. Tap the glowing one.` });
+      glow(cEls.find(x => x.dataset.ok === "1"));
+    }
+  }));
+};
+
+/* ---- L2 Odd One Out ---- */
+ACT.odd = ctx => {
+  const { tiles, ansIdx, hint, rule } = ctx.content;
+  const cards = tiles.map((t, i) => el("button", { class: "tile card", "aria-label": tileLabel(t).replace("this way", ""), "data-ok": i === ansIdx ? "1" : null }, petSpan(t)));
+  ctx.stage.append(el("div", { class: "cards" }, ...cards));
+  const panel = el("div", { class: "rulepanel", hidden: true, "aria-live": "polite" });
+  ctx.answer.append(panel);
+  const instr = "Which one does not belong?";
+  ctx.phase = "answer";
+  ctx.say(instr);
+  ctx.setHear(() => ctx.say(instr));
+  async function showRule(lead) {
+    panel.hidden = false;
+    for (let k = 0; k < rule.length; k++) {
+      panel.textContent = rule[k];
+      await live(Voice.say((k === 0 && lead ? lead + " " : "") + rule[k], { queue: true, wait: !Voice.on() }));
+    }
+  }
+  cards.forEach((c, i) => c.addEventListener("click", async () => {
+    if (!(ctx.phase === "answer" || ctx.phase === "showme") || c.hasAttribute("inert")) return;
+    if (dbl(c)) return;
+    if (i === ansIdx) {
+      ctx.phase = "done"; unglow(c); c.classList.add("right"); hop(c);
+      cards.forEach((o, j) => { if (j !== i) { o.classList.remove("dim", "inert"); o.classList.add("group"); setInert(o, true, true); } });
+      const shown = ctx.shown;
+      ctx.complete({ praise: praise("odd"), during: shown ? null : () => showRule("Yes!"), cap: 10000 });
+      return;
+    }
+    if (ctx.phase === "showme") return;
+    ctx.logErr("item"); wobble(c, true); setInert(c, true);
+    const step = ctx.miss();
+    if (step === "hint") ctx.say(hint, { hmm: true });
+    else {
+      ctx.phase = "showme"; lock(cards, true); glow(cards[ansIdx]);
+      ctx.bubble("Tap the glowing one."); Voice.cancel(); showRule();
+    }
+  }));
+};
+
+/* ---- L3 Pet Pens ---- */
+ACT.pens = ctx => {
+  const { pens, pets, say } = ctx.content;
+  const penEls = pens.map(p => {
+    const inner = el("div", { class: "in" });
+    const b = el("button", { class: "pen", "aria-label": `Pen: ${p.word}`, "data-k": p.key },
+      el("div", { class: "sign" }, p.dot ? el("span", { class: "dot", style: `background:var(--collar-${p.dot})` }) : el("span", { class: "se" + (Array.from(p.se).length > 2 ? " many" : ""), "aria-hidden": "true" }, p.se), el("span", null, p.word)),
+      el("div", { class: "fence" }), inner);
+    b._in = inner; return b;
+  });
+  const pensEl = el("div", { class: "pens" + (pens.length === 3 ? " three" : "") }, ...penEls);
+  ctx.stage.append(pensEl);
+  const wEls = pets.map(p => el("button", { class: "tile wpet", "aria-label": tileLabel(p.t), "data-k": p.pen }, petSpan(p.t)));
+  ctx.answer.append(el("div", { class: "waiting" }, ...wEls));
+  let sel = null, placed = 0;
+  const instr = "Put each pet in the right pen.";
+  ctx.phase = "answer";
+  ctx.say(instr, { speak: say });
+  ctx.setHear(() => ctx.say(instr, { speak: say }));
+  function select(w) { if (sel) sel.classList.remove("sel"); sel = w; if (w) w.classList.add("sel"); pensEl.classList.toggle("pulse", !!w); }
+  wEls.forEach(w => {
+    w.addEventListener("click", () => {
+      if (recentDrag(w) || ctx.phase !== "answer" || w.hasAttribute("inert")) return;
+      select(sel === w ? null : w);
+    });
+    draggable(w, () => penEls, zone => {
+      if (ctx.phase !== "answer") return;
+      if (!zone) { select(null); return; }
+      select(w); drop(w, zone);
+    }, () => ctx.phase === "answer");
+  });
+  penEls.forEach(p => p.addEventListener("click", () => {
+    if (!(ctx.phase === "answer" || ctx.phase === "showme") || p.hasAttribute("inert") || !sel) return;
+    drop(sel, p);
+  }));
+  function drop(w, pen) {
+    if (dbl(pen)) return;
+    const info = pets[wEls.indexOf(w)];
+    if (pen.dataset.k === info.pen) {
+      select(null); unglow(pen); unglow(w);
+      const s = petSpan(info.t); pen._in.append(s); hop(s);
+      w.remove(); placed++; Sound.play("pop");
+      if (ctx.phase === "showme") {
+        ctx.phase = "answer"; penEls.forEach(p => { unglow(p); setInert(p, false); p.classList.remove("dim"); });
+        wEls.forEach(x => setInert(x, false)); ctx.bubble(instr);
+      }
+      if (placed === pets.length) { ctx.phase = "done"; const pr = praise("pens"); ctx.complete({ praise: pr, speech: x => x + " Every pet is in the right pen!" }); }
+      return;
+    }
+    if (ctx.phase === "showme") return;
+    ctx.logErr("item"); select(null); wobble(w);
+    const step = ctx.miss();
+    if (step === "hint") ctx.say(`${info.fact} Which pen?`, { hmm: true });
+    else {
+      ctx.phase = "showme";
+      lock(wEls, true); lock(penEls, true);
+      select(w); w.classList.remove("inert", "dim"); w.style.opacity = "";
+      const right = penEls.find(p => p.dataset.k === info.pen);
+      glow(right);
+      ctx.say(`${info.fact} Tap the glowing pen.`);
+    }
+  }
+};
+
+/* ---- L4 Who Am I? ---- */
+ACT.who = ctx => {
+  const { cards, clues, ans } = ctx.content;
+  const boldNot = s => esc(s).replace(/\b(don&#39;t|not)\b/gi, "<strong>$1</strong>");
+  const cEls = clues.map((c, i) => el("div", { class: "clue" }, el("span", { class: "n", "aria-hidden": "true" }, String(i + 1)), el("span", { class: "ic", "aria-hidden": "true" }, c.icon), el("span", { class: "ct", html: boldNot(c.text) })));
+  ctx.stage.append(el("div", { class: "clues", role: "list" }, ...cEls));
+  const showX = S.crossOff();
+  const wraps = cards.map(e => {
+    const card = el("button", { class: "tile card", "aria-label": nm(e), "data-ok": e === ans ? "1" : null }, el("span", { class: "em", "aria-hidden": "true" }, e), el("small", null, nm(e)));
+    const w = el("div", { class: "wwrap", "data-e": e }, card);
+    w._card = card; w._e = e;
+    if (showX) { const x = el("button", { class: "xbtn", "aria-label": `Cross out ${nm(e)}` }, "✕"); w._x = x; w.append(x); x.addEventListener("click", () => toggleCross(w)); }
+    card.addEventListener("click", () => answer(w));
+    return w;
+  });
+  ctx.answer.append(el("div", { class: "cards" }, ...wraps));
+  let helpLine = null;
+  if (showX && !P.crossUsed && !ctx.demo) { helpLine = el("div", { class: "helpline" }, "Tap ✕ to cross a pet out."); ctx.answer.append(helpLine); }
+  let rcTok = 0; // stops an older read-along when a newer one (or a hint) starts
+  async function readClues() {
+    const my = ++rcTok;
+    cEls.forEach(c => c.classList.remove("reading"));
+    await ctx.say("Who am I? Listen to the clues.");
+    for (let i = 0; i < clues.length; i++) {
+      if (my !== rcTok) return;
+      cEls[i].classList.add("reading");
+      await live(Voice.say(clues[i].text, { queue: true, wait: true }));
+      cEls[i].classList.remove("reading");
+    }
+  }
+  ctx.phase = "answer";
+  readClues();
+  ctx.setHear(() => readClues());
+  function toggleCross(w) {
+    if (ctx.phase !== "answer" || w._x.hasAttribute("inert")) return;
+    const on = !w.classList.contains("crossed");
+    w.classList.toggle("crossed", on);
+    w._x.textContent = on ? "↩" : "✕";
+    w._x.setAttribute("aria-label", (on ? "Bring back " : "Cross out ") + nm(w._e));
+    Sound.play("cross");
+    if (!ctx.demo && !P.crossUsed) { P.crossUsed = true; saveP(); if (helpLine) helpLine.remove(); }
+  }
+  async function answer(w) {
+    if (!(ctx.phase === "answer" || ctx.phase === "showme") || w._card.hasAttribute("inert")) return;
+    if (dbl(w._card)) return;
+    rcTok++; cEls.forEach(c => c.classList.remove("reading"));
+    if (w._e === ans) {
+      ctx.phase = "done"; unglow(w._card); w.classList.remove("crossed"); w._card.classList.add("right"); hop(w._card);
+      wraps.forEach(o => { setInert(o._card, true, true); if (o._x) setInert(o._x, true, true); });
+      const p = praise("who");
+      ctx.complete({ praise: p, speech: x => `Yes, the ${nm(ans)}! ${x}` });
+      return;
+    }
+    if (ctx.phase === "showme") return;
+    ctx.logErr("item"); wobble(w._card, true); setInert(w._card, true);
+    const step = ctx.miss();
+    if (step === "hint") {
+      const k = clues.findIndex(c => !c.fits.includes(w._e));
+      const j = Math.min(clues.length - 1, Math.max(1, k));
+      for (let c = 0; c < j; c++) {
+        if (!cEls[c].querySelector(".ck")) cEls[c].append(el("span", { class: "ck" }, "✓"));
+        wraps.forEach(o => { if (!clues[c].fits.includes(o._e)) { o.classList.add("ruled"); o.classList.remove("crossed"); setInert(o._card, true, true); if (o._x) setInert(o._x, true, true); } });
+      }
+      cEls.forEach(c => c.classList.remove("ring", "reading")); cEls[j].classList.add("ring");
+      ctx.say(`Check clue ${j + 1}!`, { hmm: true, speak: `Check clue ${j + 1}! ${clues[j].text}` });
+    } else {
+      ctx.phase = "showme";
+      wraps.forEach(o => { setInert(o._card, true); if (o._x) setInert(o._x, true); });
+      const aw = wraps.find(o => o._e === ans); aw.classList.remove("crossed", "ruled");
+      glow(aw._card);
+      ctx.say(`Only the ${nm(ans)} fits every clue.`, { speak: `Only the ${nm(ans)} fits every clue. Tap the glowing one.` });
+    }
+  }
+};
+
+/* =====================================================================
+   PROGRESS (Hub.save "progress" / "rounds" / "session")
+   ===================================================================== */
+function freshProgress() {
+  const activity = {}; ACTS.forEach(a => { activity[a] = { tries: 0, firstTry: 0, orderErr: 0, itemErr: 0, recent: [] }; });
+  return {
+    v: 1, levels: {},
+    span: { peek: { best: 0, history: [] }, hide: { best: 0, history: [] }, helper: { best: 0, history: [] } },
+    activity, park: { pets: [], gifts: {} }, demosSeen: {}, sessions: [], totalMs: 0, lastLevel: 0, crossUsed: false,
+  };
+}
+function loadProgress() {
+  const f = freshProgress(), p = store.load("progress", null);
+  if (!p || typeof p !== "object" || p.v !== 1) return f;
+  const out = Object.assign(f, p);
+  out.span = Object.assign(freshProgress().span, p.span || {});
+  out.activity = Object.assign(freshProgress().activity, p.activity || {});
+  ACTS.forEach(a => { out.activity[a] = Object.assign({ tries: 0, firstTry: 0, orderErr: 0, itemErr: 0, recent: [] }, out.activity[a]); });
+  out.park = Object.assign({ pets: [], gifts: {} }, p.park || {});
+  out.levels = p.levels || {}; out.demosSeen = p.demosSeen || {}; out.sessions = p.sessions || [];
+  return out;
+}
+let P = loadProgress();
+function saveP() { store.save("progress", P); }
+function lv(n) {
+  const L = P.levels[n] = P.levels[n] || {};
+  return Object.assign(L, { rounds: L.rounds || 0, bestStars: L.bestStars || 0, mastered: !!L.mastered, recent: L.recent || [], recentN: L.recentN || [] });
+}
+// One saved round per level ("rounds" = { level: round }), so hopping to another
+// level never throws away the round she left. Rounds older than 24 h are dropped.
+function validRound(r) {
+  if (!r || !r.plan || !r.level || typeof r.idx !== "number") return null;
+  if (Date.now() - (r.savedAt || 0) > 24 * 3600 * 1000 || r.idx >= r.plan.length) return null;
+  r.used = r.used || {}; r.results = r.results || []; r.adaptive = r.adaptive || { delta: 0, ok: 0, shown: 0 }; r.oddFT = r.oddFT || 0;
+  return r;
+}
+function savedRounds() {
+  const m = store.load("rounds", null) || {}, out = {};
+  const old = store.load("round", null); // single-round key from the first build
+  if (old) { if (old.level && !m[old.level]) m[old.level] = old; store.save("round", null); }
+  for (const k in m) { const r = validRound(m[k]); if (r) out[k] = r; }
+  return out;
+}
+function saveRound() { if (!R) return; const m = savedRounds(); m[R.level] = R; store.save("rounds", m); }
+function clearRound() { if (R) { const m = savedRounds(); delete m[R.level]; store.save("rounds", m); } R = null; }
+function loadRound() { const m = savedRounds(); let best = null; for (const k in m) if (!best || m[k].savedAt > best.savedAt) best = m[k]; return best; }
+function playLevel(n) { const r = savedRounds()[n]; if (r) { R = r; resumeRound(); } else newRound(n); }
+let SESSION = store.load("session", null);
+function saveSession() { store.save("session", SESSION); }
+function touchSession() {
+  const now = Date.now();
+  if (!SESSION || !SESSION.start || now - (SESSION.last || 0) > 30 * 60000) {
+    SESSION = { start: now, last: now, roundsDone: 0, stars: 0, newGifts: [], newPets: [], levels: [] };
+  } else {
+    P.totalMs = (P.totalMs || 0) + Math.max(0, now - SESSION.last);
+    SESSION.last = now;
+  }
+  let rec = P.sessions.find(s => s.start === SESSION.start);
+  if (!rec) {
+    rec = { start: SESSION.start, date: new Date(SESSION.start).toLocaleDateString("en-GB", { day: "numeric", month: "short" }), mins: 0, levels: [], stars: 0 };
+    P.sessions.push(rec); while (P.sessions.length > 10) P.sessions.shift();
+  }
+  rec.mins = Math.max(1, Math.round((SESSION.last - SESSION.start) / 60000));
+  rec.levels = SESSION.levels.slice(); rec.stars = SESSION.stars;
+  saveSession(); saveP();
+}
+function updateSpan(t, v) {
+  const s = P.span[t]; if (!s) return;
+  s.best = Math.max(s.best || 0, v);
+  const key = SESSION ? SESSION.start : 0;
+  let h = s.history.find(x => x.s === key);
+  if (!h) { h = { s: key, v: 0 }; s.history.push(h); while (s.history.length > 10) s.history.shift(); }
+  h.v = Math.max(h.v, v);
+}
+const isOpen = n => S.unlockAll() || n === 1 || lv(n - 1).rounds > 0;
+function totals() { let stars = 0, ribbons = 0; for (let n = 1; n <= 8; n++) { const L = lv(n); stars += L.bestStars; if (L.mastered) ribbons++; } return { stars, ribbons }; }
+function suggestLevel() {
+  if (R) return R.level;
+  const all = [1, 2, 3, 4, 5, 6, 7, 8];
+  if (all.every(n => lv(n).mastered)) {
+    const min = Math.min(...all.map(n => lv(n).bestStars));
+    return lv(8).bestStars === min ? 8 : all.find(n => lv(n).bestStars === min);
+  }
+  return all.find(n => !lv(n).mastered && isOpen(n)) || 1;
+}
+
+/* =====================================================================
+   ROUNDS
+   ===================================================================== */
+function buildPlan(n) {
+  const N = S.items();
+  if (n === 8) {
+    const base = [{ t: "peek", sz: 5 }, { t: "who", set: "L8" }, { t: "hide", sz: 4 }, { t: "pens", set: "L8" }, { t: "helper", sz: 3 }, { t: "who", set: "L8" }, { t: "peek", sz: 5 }, { t: "next", set: "T" }];
+    if (N === 6) return base.slice(0, 6);
+    if (N === 10) return base.concat([{ t: "hide", sz: 4 }, { t: "pens", set: "L8" }]);
+    return base;
+  }
+  const L = LEVELS[n], plan = [];
+  for (let i = 0; i < N; i++) {
+    if (i % 2 === 0) plan.push({ t: L.mem, sz: L.sz });
+    else if (n === 7) plan.push(((i - 1) / 2) % 2 === 0 ? { t: "pens", set: "L7" } : { t: "next", set: "T" });
+    else plan.push({ t: L.logic, set: L.set });
+  }
+  return plan;
+}
+function newRound(n) {
+  touchSession();
+  if (!SESSION.levels.includes(LEVELS[n].name)) SESSION.levels.push(LEVELS[n].name);
+  R = { level: n, plan: buildPlan(n), idx: 0, results: [], adaptive: { delta: 0, ok: 0, shown: 0 }, used: {}, oddFT: 0, sessionRound: (SESSION.roundsDone || 0) + 1, savedAt: Date.now() };
+  P.lastLevel = n; saveP(); saveRound(); touchSession();
+  levelStart();
+}
+function resumeRound() {
+  touchSession();
+  R.savedAt = Date.now(); saveRound();
+  buildPlay(); runItem();
+}
+function levelStart() {
+  buildPlay(); renderPaws();
+  const L = LEVELS[R.level];
+  const go = el("button", { class: "btn pop" }, "Let's go! ▶");
+  F.stage.append(el("div", { class: "introcard" }, el("div", { class: "bigem", "aria-hidden": "true" }, L.e), el("h2", { class: "title" }, L.name), el("p", null, L.intro), go));
+  bubble("👋");
+  const say = () => Voice.say(`${L.name}. ${L.intro}`);
+  setHear(say); say();
+  go.onclick = () => runItem();
+}
+function genContent(it, ctx) {
+  switch (it.t) {
+    case "peek": return genPeek(memSize(it), it.sz);
+    case "hide": return genHide(memSize(it), it.sz);
+    case "helper": return genHelper(memSize(it), R.level);
+    case "next": return genNext(it.set);
+    case "odd": return genOdd(it.set);
+    case "pens": return genPens(it.set);
+    case "who": return genWho(it.set);
+  }
+}
+function runItem() {
+  if (!F) buildPlay();
+  bump(); clearArea();
+  const it = R.plan[R.idx];
+  renderPaws();
+  if (S.demos() && !P.demosSeen[it.t]) {
+    runDemo(it.t, () => { P.demosSeen[it.t] = true; afterDemo[it.t] = true; saveP(); runItem(); });
+    return;
+  }
+  const ctx = makeCtx(it, false, res => itemDone(res, ctx));
+  ctx.content = genContent(it, ctx);
+  ACT[it.t](ctx);
+}
+function itemDone(res, ctx) {
+  const t = R.plan[R.idx].t, a = P.activity[t];
+  a.tries++; if (res === "first") a.firstTry++;
+  a.recent.push(res === "first" ? 1 : 0); while (a.recent.length > 20) a.recent.shift();
+  if (res === "first" && MEM.includes(t) && ctx.span) updateSpan(t, ctx.span);
+  if (t === "odd" && res === "first") R.oddFT++;
+  if (MEM.includes(t)) {
+    const ad = R.adaptive;
+    if (res === "first") { ad.ok++; ad.shown = 0; if (ad.ok >= 2) { ad.delta = Math.min(1, ad.delta + 1); ad.ok = 0; } }
+    else if (res === "shown") { ad.shown++; ad.ok = 0; if (ad.shown >= 2) { ad.delta = Math.max(-4, ad.delta - 1); ad.shown = 0; } }
+    else { ad.ok = 0; ad.shown = 0; }
+  }
+  R.results[R.idx] = res; R.idx++; R.savedAt = Date.now();
+  touchSession(); saveP();
+  if (R.idx >= R.plan.length) finishRound();
+  else { saveRound(); runItem(); }
+}
+let LAST_DONE = null;
+function finishRound() {
+  const n = R.level, N = R.plan.length, res = R.results.slice();
+  const ft = res.filter(r => r === "first").length, ok = res.filter(r => r === "first" || r === "second").length;
+  const stars = ok >= Math.ceil(N * 7 / 8) ? 3 : ok >= Math.ceil(N * 5 / 8) ? 2 : 1;
+  const L = lv(n);
+  L.rounds++; L.bestStars = Math.max(L.bestStars, stars);
+  const nowM = ft >= Math.ceil(N * 6 / 8), newRibbon = nowM && !L.mastered;
+  if (nowM) L.mastered = true;
+  L.recent.push(ft); L.recentN.push(N); while (L.recent.length > 3) { L.recent.shift(); L.recentN.shift(); }
+  let adopt = false, gift = null;
+  if (!P.park.pets.includes(String(n))) { P.park.pets.push(String(n)); adopt = true; }
+  else { const g = P.park.gifts[n] = P.park.gifts[n] || []; gift = GIFTS[Math.min(g.length, GIFTS.length - 1)]; g.push(gift); }
+  touchSession();
+  SESSION.roundsDone = (SESSION.roundsDone || 0) + 1; SESSION.stars = (SESSION.stars || 0) + stars;
+  if (adopt) SESSION.newPets.push(String(n)); if (gift) SESSION.newGifts.push(gift);
+  touchSession();
+  clearRound(); saveP();
+  LAST_DONE = { n, stars, adopt, gift, newRibbon, res };
+  roundDone(false);
+}
+
+/* =====================================================================
+   DEMO ("Watch me", 3.3)
+   ===================================================================== */
+function demoContent(type) {
+  // Dedicated farm-animal items (LD round 1, issue 3). None of these appear in play.
+  switch (type) {
+    case "peek": return { seq: ["🐸", "🦆"], choices: ["🐸", "🦆", "🐷"] };
+    case "hide": return { pets: ["🐷", "🐔"], pos: { "🐷": 1, "🐔": 2 }, asks: ["🐷"], doors: 4, cols: 2 };
+    case "helper": return { steps: [{ pet: "🐱", treat: "🍎" }, { pet: "🐶", treat: "🧸" }], shelf: ["🦴", "🥕", "🍎", "🧸"], pets: ["🐶", "🐱", "🐰"] };
+    case "next": { const t = E("🐷🐮🐷🐮🐷").map(e => T(e)).concat(["?"]), a = T("🐮"); return { tiles: t, full: t.map(x => (x === "?" ? a : x)), q: 5, ans: a, unit: 2, choices: [T("🐮"), T("🐷"), T("🐔")], kind: "" }; }
+    case "odd": return { tiles: E("🐔🐔🐷🐔").map((e, i) => T(e, { ans: i === 2 })), ansIdx: 2, hint: L2HINT, rule: ["Three are chickens.", "The pig is different."] };
+    case "pens": return {
+      pens: [{ key: "pig", se: "🐷", word: "pigs" }, { key: "chicken", se: "🐔", word: "chickens" }],
+      pets: E("🐷🐔🐷🐔").map(e => ({ t: T(e), pen: e === "🐷" ? "pig" : "chicken", fact: e === "🐷" ? "This is a pig." : "This is a chicken." })),
+      say: "Put each pet in the right pen. Pigs or chickens?",
+    };
+    case "who": return { cards: E("🐷🐔🐮🐑"), ans: "🐷", clues: [{ text: "I have 4 legs.", icon: "🦵", fits: E("🐷🐮🐑") }, { text: "I say oink.", icon: "🔊", fits: E("🐷") }] };
+  }
+}
+function runDemo(type, then) {
+  let finished = false;
+  const veil = el("div", { class: "demoveil", "aria-hidden": "true" });
+  const hand = el("div", { class: "dhand", "aria-hidden": "true", style: "display:none" }, "👆");
+  const skip = el("button", { class: "ghost skipbtn" }, "Skip ⏭");
+  F.play.append(veil, skip, hand);
+  const end = () => { if (finished) return; finished = true; veil.remove(); hand.remove(); skip.remove(); then(); };
+  skip.onclick = end;
+  const ctx = makeCtx({ t: type, sz: 2 }, true, async () => {
+    bubble("Now it's your turn!"); await live(Voice.say("Now it's your turn!")); await sleep(300); end();
+  });
+  ctx.content = demoContent(type);
+  async function moveHand(target) {
+    if (!target || !target.isConnected) return;
+    const r = target.getBoundingClientRect();
+    hand.style.display = "block";
+    hand.style.left = Math.max(100, r.left + r.width / 2 - 24) + "px";
+    hand.style.top = (r.top + r.height / 2 - 8) + "px";
+    await sleep(RM() ? 1000 : 650);
+  }
+  async function tap(target) {
+    if (!target) return;
+    await moveHand(target);
+    hand.classList.add("press"); target.click(); await sleep(220); hand.classList.remove("press"); await sleep(420);
+  }
+  async function until(fn) { for (let k = 0; k < 200 && !fn(); k++) await sleep(100); }
+  const Q = s => F.play.querySelector(s);
+  const scripts = {
+    async peek() { await tap(Q(".ready")); await until(() => ctx.phase === "answer"); for (const e of ctx.content.seq) await tap(Q(`.choice[data-e="${e}"]`)); },
+    async hide() { await tap(Q(".ready")); await until(() => ctx.phase === "answer"); await tap(Q(`.door[data-i="${ctx.content.pos[ctx.content.asks[0]]}"]`)); },
+    async helper() {
+      await tap(Q(".ready")); await until(() => ctx.phase === "answer");
+      for (const s of ctx.content.steps) { await tap(Q(`.treat[data-e="${s.treat}"]`)); await tap(Q(`.petcard[data-e="${s.pet}"]`)); }
+    },
+    async next() { await sleep(1200); await tap(Q('.pchoice[data-ok="1"]')); },
+    async odd() { await sleep(1200); await tap(Q('.card[data-ok="1"]')); },
+    async pens() {
+      await sleep(1000);
+      for (const k of ctx.content.pets.map(p => p.pen)) { const w = Q(`.wpet[data-k="${k}"]`); await tap(w); await tap(Q(`.pen[data-k="${k}"]`)); }
+    },
+    async who() {
+      await sleep(1500);
+      const wrong = ctx.content.cards.find(e => !ctx.content.clues[0].fits.includes(e));
+      await tap(Q(`.wwrap[data-e="${wrong}"] .xbtn`)); await sleep(400);
+      await tap(Q('.card[data-ok="1"]'));
+    },
+  };
+  (async () => {
+    bubble("Watch me first!"); await live(Voice.say("Watch me first!")); await sleep(300);
+    ACT[type](ctx);
+    await scripts[type]();
+  })();
+}
+
+/* =====================================================================
+   HOME (3.1)
+   ===================================================================== */
+let greeted = false;
+function home() {
+  R = loadRound();
+  const s = screen("screen home", false);
+  const tt = totals();
+  s.append(el("div", { class: "home-top" }, el("div", { class: "chip", "aria-label": `${tt.stars} stars and ${tt.ribbons} ribbons` }, el("span", { class: "st" }, "★"), ` ${tt.stars}   🎀 ${tt.ribbons}`)));
+  const name = kidName();
+  const greet = name ? `Hi ${name}! Let's play with the pets.` : "Hi! Let's play with the pets.";
+  const firstRun = !Object.keys(P.levels).some(k => P.levels[k].rounds > 0);
+  const pipText = el("span", { class: "pc-text" }, "🐾");
+  const pipFace = el("button", { class: "pipface", "aria-label": "Pip the puppy" }, "🐶");
+  const pipSay = t => { pipText.textContent = t; Voice.say(t); };
+  pipFace.onclick = () => { if (!RM()) { pipFace.classList.remove("wag"); void pipFace.offsetWidth; pipFace.classList.add("wag"); } };
+  const left = el("div", { class: "hcol-l" });
+  left.append(el("div", { class: "hero" }, el("div", null, el("h1", { class: "title" }, "Pet Puzzle Pals"), el("p", { class: "greet" }, greet)), el("div", { class: "pipcard" }, pipFace, pipText)));
+  if (!storageOK) left.append(el("p", { class: "warn" }, "This browser isn't saving progress. Ask a grown-up to check the browser settings."));
+  const allM = [1, 2, 3, 4, 5, 6, 7, 8].every(n => lv(n).mastered);
+  if (allM) left.append(el("div", { class: "banner" }, "All 8 pet homes have a ribbon! 🎀"));
+  if (R) {
+    const L = LEVELS[R.level];
+    const k = R.results.filter(Boolean).length;
+    left.append(el("button", { class: "keep", onclick: () => resumeRound(), "aria-label": `Keep going: ${L.name}, ${k} of ${R.plan.length}` },
+      el("span", null, `Keep going: ${L.e} ${L.name} · ${k} of ${R.plan.length} 🐾`), el("span", { class: "go", "aria-hidden": "true" }, "▶")));
+  }
+  const sug = suggestLevel();
+  left.append(el("button", { class: "btn pop playbtn", onclick: () => playLevel(sug) }, "Play ▶", el("span", { class: "l2" }, `${LEVELS[sug].e} ${LEVELS[sug].name}`)));
+  // trail
+  const trail = el("div", { class: "trail" });
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("aria-hidden", "true");
+  trail.append(svg);
+  const stops = [];
+  const SR = savedRounds();
+  for (let n = 1; n <= 8; n++) {
+    const L = lv(n), Lv = LEVELS[n], open = isOpen(n);
+    const stars = L.rounds > 0 ? el("span", { class: "stars", "aria-label": `${L.bestStars} stars` }, "★".repeat(L.bestStars), el("span", { class: "off" }, "☆".repeat(3 - L.bestStars)), L.mastered ? " 🎀" : "") : el("span", { class: "stars" });
+    const b = el("button", { class: "stop" + (n % 2 === 0 ? " even" : "") + (n === sug ? " next" : "") + (open ? "" : " lockd"), "aria-label": `${n}. ${Lv.name}${open ? "" : ", locked"}` },
+      el("span", { class: "num", "aria-hidden": "true" }, open ? String(n) : "🔒"),
+      el("span", { class: "lem", "aria-hidden": "true" }, Lv.e),
+      el("span", null, el("span", { class: "nm" }, Lv.name), el("span", { class: "sb" }, SR[n] ? `${Lv.sub} · 🐾 ${SR[n].results.filter(Boolean).length} of ${SR[n].plan.length}` : Lv.sub), stars),
+      P.park.pets.includes(String(n)) ? el("span", { class: "mini", "aria-hidden": "true" }, Lv.e) : null,
+      n === sug ? el("span", { class: "sticker", "aria-hidden": "true" }, "Next") : null);
+    b.onclick = () => {
+      if (!open) { pipSay(`Finish ${LEVELS[n - 1].name} to open this one.`); return; }
+      playLevel(n);
+    };
+    stops.push(b); trail.append(b);
+  }
+  const drawPath = () => {
+    if (!trail.isConnected) return;
+    const tr = trail.getBoundingClientRect();
+    const pts = stops.map(b => { const r = b.getBoundingClientRect(); return `${r.left + r.width / 2 - tr.left},${r.top + r.height / 2 - tr.top}`; });
+    svg.innerHTML = `<polyline points="${pts.join(" ")}" fill="none" stroke="var(--line)" stroke-width="5" stroke-dasharray="2 12" stroke-linecap="round"/>`;
+  };
+  const right = el("div", { class: "hcol-r" }, trail);
+  const park = el("button", { class: "btn sky parkbtn", onclick: () => petPark("home") }, `🏡 Pet Park (${P.park.pets.length})`);
+  const grown = el("button", { class: "grown" }, "Grown-ups: press and hold");
+  s.append(el("div", { class: "home-grid" }, left, right, el("div", { class: "homebtns" }, park, grown)));
+  requestAnimationFrame(drawPath);
+  window.onresize = () => requestAnimationFrame(drawPath);
+  // grown-ups gate: hold for 2 s
+  let ht = null;
+  const startHold = e => { e.preventDefault(); if (ht) return; grown.classList.add("holding"); grown.textContent = "Keep holding…"; ht = setTimeout(() => { ht = null; grownUps(); }, 2000); };
+  const endHold = () => { if (ht) { clearTimeout(ht); ht = null; } grown.classList.remove("holding"); grown.textContent = "Grown-ups: press and hold"; };
+  grown.addEventListener("pointerdown", startHold);
+  ["pointerup", "pointerleave", "pointercancel"].forEach(ev => grown.addEventListener(ev, endHold));
+  grown.addEventListener("contextmenu", e => e.preventDefault());
+  grown.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") grownUps(); });
+  // Pip greets after the first tap (iOS needs a gesture before speech)
+  const g = GEN;
+  if (!greeted) s.addEventListener("pointerdown", () => {
+    if (greeted) return; greeted = true;
+    setTimeout(() => {
+      if (g !== GEN) return;
+      const line = allM ? "Wow! Every pet home has a ribbon!" : firstRun ? (name ? `Hi ${name}! I'm Pip. Let's play with the pets!` : "Hi! I'm Pip. Let's play with the pets!") : greet;
+      pipSay(line);
+    }, 350);
+  }, { once: true });
+}
+
+/* =====================================================================
+   ROUND DONE (3.12), PET BREAK (3.13), ONE MORE (3.14), BEDTIME (3.15)
+   ===================================================================== */
+function nextLevelAfter(n) { return lv(n).mastered ? Math.min(8, n + 1) : n; }
+function roundDone(quiet) {
+  const d = LAST_DONE; if (!d) { home(); return; }
+  const s = screen("screen center", false);
+  const L = LEVELS[d.n];
+  s.append(el("div", { class: "head" }, el("button", { class: "ghost", onclick: () => home() }, "⬅ Homes")), el("h1", { class: "title" }, "Round done!"));
+  const starEls = [0, 1, 2].map(i => el("span", { class: i < d.stars ? "" : "off" }, i < d.stars ? "★" : "☆"));
+  const starRow = el("div", { class: "bigstars", "aria-label": `${d.stars} stars` }, ...starEls);
+  s.append(starRow);
+  s.append(el("div", { class: "pawsum", "aria-hidden": "true" }, ...d.res.map(r => el("div", { class: "paw " + (r === "first" ? "gold" : "plain") }, el("span", null, "🐾")))));
+  if (d.adopt) s.append(el("div", { class: "reward" }, el("div", { class: "big", "aria-hidden": "true" }, L.e), el("p", { class: "lead" }, `You adopted ${L.pet}!`), el("p", null, `${L.pet} lives in your Pet Park now.`)));
+  else s.append(el("div", { class: "reward" }, el("div", { class: "big", "aria-hidden": "true" }, `${L.e} + ${d.gift}`), el("p", { class: "lead" }, `A gift for ${L.pet}!`)));
+  if (d.newRibbon) s.append(el("div", { class: "ribbon" }, `🎀 ${L.name}: Got it!`));
+  const rs = S.rounds(), doneR = SESSION ? SESSION.roundsDone : 1;
+  let label, action;
+  const nxt = nextLevelAfter(d.n);
+  if (doneR >= rs) { label = "Bedtime ▶"; action = () => bedtime(); }
+  else if (S.petBreak() && doneR === 1) { label = "Pet Break ▶"; action = () => petBreak(nxt); }
+  else { label = "Next ▶"; action = () => oneMore(nxt); }
+  s.append(el("div", { class: "stack" }, el("button", { class: "btn pop", style: "min-height:96px;min-width:300px;font-size:32px", onclick: action }, label), el("button", { class: "ghost", onclick: () => petPark("done") }, "🏡 Pet Park")));
+  if (quiet) return;
+  Sound.play("done");
+  const anim = !RM();
+  if (anim) { starEls.forEach(e => { e.style.visibility = "hidden"; }); starEls.forEach((e, i) => later(() => { e.style.visibility = ""; e.classList.add("in"); if (i < d.stars) Sound.play("star", i); }, 400 + i * 250)); confetti(); }
+  else for (let i = 0; i < d.stars; i++) later(() => Sound.play("star", i), 400 + i * 200);
+  Voice.say(`Round done! ${d.adopt ? `You adopted ${L.pet} the ${L.kind}!` : `A gift for ${L.pet}!`}${d.newRibbon ? " You got a ribbon!" : ""}`);
+}
+function confetti() {
+  if (RM()) return;
+  const w = window.innerWidth;
+  for (let i = 0; i < 18; i++) {
+    const c = el("div", { class: "confetti", "aria-hidden": "true", style: `left:${100 + Math.random() * Math.max(100, w - 160)}px;animation-delay:${Math.random() * 0.3}s` }, "🐾");
+    document.body.append(c); setTimeout(() => c.remove(), 1700);
+  }
+}
+function petBreak(nxt) {
+  const s = screen("screen", false);
+  const pipText = el("div", { class: "bubble" }, "Pet Break! Pick a pet to care for.");
+  s.append(el("div", { class: "head" }), el("div", { class: "parkpip" }, pipText, el("div", { class: "pipface", "aria-hidden": "true" }, "🐶")));
+  Voice.say("Pet Break! Pick a pet to care for.");
+  const pets = P.park.pets.map(Number).sort((a, b) => a - b);
+  const zone = el("div");
+  const done = {};
+  let cur = null;
+  const cards = pets.map(n => el("button", { class: "tile bpet", "aria-label": LEVELS[n].pet, onclick: () => choose(n) }, el("span", { class: "em", "aria-hidden": "true" }, LEVELS[n].e), el("small", null, LEVELS[n].pet)));
+  s.append(el("div", { class: "breakpets" }, ...cards), zone);
+  const acts = [["feed", "🥕", "Feed", "Yum!"], ["brush", EM.brush, "Brush", "So soft!"], ["cuddle", "💛", "Cuddle", "I love you!"]];
+  function choose(n) {
+    cur = n; cards.forEach((c, i) => c.classList.toggle("sel", pets[i] === n));
+    zone.innerHTML = "";
+    const big = el("span", { class: "big", "aria-hidden": "true" }, LEVELS[n].e);
+    const cz = el("div", { class: "carezone" }, big, el("div", { class: "nm" }, LEVELS[n].pet));
+    const btns = acts.map(([k, e, label, line]) => el("button", { class: "tile care", "aria-label": label, onclick: () => care(k, line, big, cz) }, done[k] ? el("span", { class: "tick" }, "✓") : null, el("span", { class: "em", "aria-hidden": "true" }, e), el("small", null, label)));
+    zone.append(cz, el("div", { class: "cares" }, ...btns));
+    const more = el("button", { class: "btn pop", style: "min-height:80px", hidden: !acts.every(a => done[a[0]]), onclick: () => oneMore(nxt) }, "Ready for more ▶");
+    zone.append(el("div", { class: "stack" }, more));
+    zone._more = more; zone._btns = btns;
+  }
+  function care(k, line, big, cz) {
+    hop(big); Sound.play("heart");
+    pipText.textContent = line; Voice.say(line);
+    for (let i = 0; i < 3; i++) {
+      const h = el("span", { class: "heart", "aria-hidden": "true", style: `left:calc(50% + ${(i - 1) * 50}px);top:30%` }, "💛");
+      if (RM()) h.style.animation = "none";
+      cz.append(h); setTimeout(() => h.remove(), RM() ? 600 : 850);
+    }
+    if (!done[k]) {
+      done[k] = true;
+      const b = zone._btns[acts.findIndex(a => a[0] === k)];
+      b.prepend(el("span", { class: "tick" }, "✓"));
+    }
+    if (acts.every(a => done[a[0]])) {
+      zone._more.hidden = false;
+      later(() => { const t = `${LEVELS[cur].pet} is happy! Ready for more?`; pipText.textContent = t; Voice.say(t); }, 900);
+    }
+  }
+  if (pets.length === 1) choose(pets[0]);
+}
+function oneMore(n) {
+  const s = screen("screen center", false);
+  const L = LEVELS[n];
+  s.append(el("div", { class: "head" }), el("h1", { class: "title", style: "margin-top:40px" }, "One more round?"), el("p", { class: "chip", style: "display:inline-block;margin:20px 0" }, `${L.e} ${L.name}`));
+  s.append(el("div", { class: "stack" },
+    el("button", { class: "btn pop", style: "min-width:min(360px,90vw);min-height:120px;font-size:40px", onclick: () => playLevel(isOpen(n) ? n : 1) }, "Yes! ▶"),
+    el("button", { class: "ghost", style: "min-width:240px;min-height:64px", onclick: () => bedtime() }, "All done")));
+  Voice.say("One more round?");
+}
+function bedtime() {
+  const s = screen("bed", false);
+  const inner = el("div", { class: "screen center" });
+  s.append(el("div", { class: "moon", "aria-hidden": "true" }, "🌙"));
+  [[12, 20], [30, 70], [18, 85], [40, 12], [8, 55]].forEach(([t, l]) => s.append(el("span", { class: "star", "aria-hidden": "true", style: `top:${t}%;left:${l}%` }, "✦")));
+  s.append(inner);
+  const pets = P.park.pets.map(Number).sort((a, b) => a - b);
+  inner.append(el("div", { class: "head" }), el("div", { class: "sleepers", "aria-hidden": "true" }, ...(pets.length ? pets.map(n => el("span", null, LEVELS[n].e + "💤")) : [el("span", null, "🐶💤")])));
+  const name = kidName();
+  const l1 = name ? `Great playing today, ${name}!` : "Great playing today!";
+  inner.append(el("p", { class: "line" }, l1), el("p", { class: "line" }, "Your pets are sleepy. See you next time!"));
+  const ses = SESSION || { stars: 0, newPets: [], newGifts: [] };
+  const news = [...(ses.newPets || []).map(n => `${LEVELS[n].e} ${LEVELS[n].pet}`), ...(ses.newGifts || [])];
+  inner.append(el("p", { class: "today" }, el("span", null, `Today: ★ ${ses.stars || 0}`), news.length ? el("span", { style: "margin-left:32px" }, `New: ${news.join(" · ")}`) : null));
+  inner.append(el("div", { class: "stack" },
+    el("button", { class: "btn sky", style: "min-width:300px;min-height:88px", onclick: () => petPark("bed") }, "🏡 Pet Park"),
+    el("button", { class: "ghost playmore", onclick: () => { if (SESSION) { SESSION.roundsDone = 0; saveSession(); } home(); } }, "Play more")));
+  Sound.play("bedtime");
+  Voice.say(`${l1} Your pets are sleepy. See you next time!`);
+}
+
+/* =====================================================================
+   PET PARK (3.16)
+   ===================================================================== */
+function petPark(from) {
+  const s = screen("screen park", false);
+  const back = el("button", { class: "ghost" }, "⬅ Back");
+  back.onclick = () => (from === "done" ? roundDone(true) : from === "bed" ? bedtime() : home());
+  s.append(el("div", { class: "head" }, back), el("h1", { class: "title center" }, "Pet Park"));
+  const pipText = el("span", null, "Tap a pet to say hello!");
+  const goSlot = el("span");
+  s.append(el("div", { class: "parkpip" }, el("div", { class: "bubble" }, pipText, goSlot), el("div", { class: "pipface", "aria-hidden": "true" }, "🐶")));
+  const panel = el("div", { class: "meadowpanel" });
+  s.append(panel);
+  if (!P.park.pets.length) panel.append(el("p", { class: "center", style: "font-size:24px;font-weight:600" }, "Your pets will live here. Play a round to meet one!"));
+  const plots = el("div", { class: "plots" });
+  let lastWait = null, lastWaitAt = 0;
+  for (let n = 1; n <= 8; n++) {
+    const L = LEVELS[n];
+    if (P.park.pets.includes(String(n))) {
+      const gifts = P.park.gifts[n] || [];
+      const stars = gifts.filter(g => g === "⭐").length, others = gifts.filter(g => g !== "⭐");
+      let gtxt = others.slice(0, 5).join("") + (others.length > 5 ? ` +${others.length - 5}` : "");
+      if (stars) gtxt += stars > 1 ? ` ⭐×${stars}` : " ⭐";
+      const pe = el("span", { class: "pe", "aria-hidden": "true" }, L.e);
+      const b = el("button", { class: "plot", "aria-label": L.pet }, pe, el("span", { class: "pn" }, L.pet), el("span", { class: "gifts", "aria-hidden": "true" }, gtxt));
+      b.onclick = () => {
+        hop(pe); Sound.play("pop"); Voice.say(`I'm ${L.pet}!`);
+        $$(".saybub", plots).forEach(x => x.remove());
+        const sb = el("span", { class: "saybub" }, `I'm ${L.pet}!`); b.append(sb); setTimeout(() => sb.remove(), 1500);
+      };
+      plots.append(b);
+    } else {
+      const b = el("button", { class: "plot waiting", "aria-label": `${L.name}: a friend is waiting` }, el("span", { class: "pe", "aria-hidden": "true" }, L.e), el("span", { class: "pn" }, L.name));
+      b.onclick = () => {
+        if (!isOpen(n)) { pipText.textContent = `Finish ${LEVELS[n - 1].name} to open this one.`; goSlot.innerHTML = ""; Voice.say(pipText.textContent); return; }
+        if (lastWait === n && performance.now() - lastWaitAt < 5000) { playLevel(n); return; }
+        lastWait = n; lastWaitAt = performance.now();
+        pipText.textContent = `A friend is waiting in ${L.name}!`; Voice.say(pipText.textContent);
+        goSlot.innerHTML = ""; goSlot.append(el("button", { class: "btn pop", style: "min-height:64px;font-size:24px", onclick: () => playLevel(n) }, "Go ▶"));
+      };
+      plots.append(b);
+    }
+  }
+  panel.append(plots);
+}
+
+/* =====================================================================
+   GROWN-UPS (3.17)
+   ===================================================================== */
+function writeHubSetting(key, val) {
+  let s = null;
+  try { s = JSON.parse(localStorage.getItem("hub:settings") || "null"); } catch (e) {}
+  if (!s || typeof s !== "object") s = {};
+  s.games = s.games || {}; s.games[GAME_ID] = s.games[GAME_ID] || {}; s.games[GAME_ID][key] = val;
+  try { localStorage.setItem("hub:settings", JSON.stringify(s)); } catch (e) {}
+}
+function sparkline(hist) {
+  const v = (hist || []).map(h => h.v);
+  if (v.length < 2) return el("span", { class: "muted" }, "Not enough sessions yet.");
+  const max = Math.max(...v, 2), min = Math.min(...v, 0), W = 140, H = 36, pad = 6;
+  const pts = v.map((y, i) => [pad + i * (W - 2 * pad) / (v.length - 1), H - pad - (y - min) / Math.max(1, max - min) * (H - 2 * pad)]);
+  const last = pts[pts.length - 1];
+  const wrap = el("span");
+  wrap.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true"><polyline points="${pts.map(p => p.join(",")).join(" ")}" fill="none" stroke="var(--sky)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${last[0]}" cy="${last[1]}" r="6" fill="var(--sky)"/></svg>`;
+  return wrap;
+}
+function pct(a) { return a.recent.length ? Math.round(100 * a.recent.reduce((x, y) => x + y, 0) / a.recent.length) : null; }
+function grownUps() {
+  const s = screen("screen gu", false);
+  document.body.className = "selectable";
+  s.append(el("div", { class: "head" }, el("button", { class: "ghost", onclick: () => home() }, "⬅ Back to game")));
+  s.append(el("h1", { class: "title" }, "Grown-ups"), el("p", { style: "font-size:20px" }, "This is practice and play, not a test."));
+  if (!storageOK) s.append(el("p", { class: "warn" }, "This browser isn't saving progress, so everything resets when the page closes."));
+  const anyRounds = Object.keys(P.levels).some(k => P.levels[k].rounds > 0);
+  if (!anyRounds) s.append(el("div", { class: "gcard" }, "No rounds yet. Progress appears after the first round."));
+  // spans
+  const spanT = el("table");
+  [["peek", "Who Peeked", "pets"], ["hide", "Hide and Seek", "pets"], ["helper", "Pet Helper", "steps"]].forEach(([k, label, unit]) => {
+    const sp = P.span[k];
+    spanT.append(el("tr", null, el("td", null, label), el("td", null, sp.best ? `${sp.best} ${unit}` : "—"), el("td", null, sparkline(sp.history))));
+  });
+  s.append(el("div", { class: "gcard" }, el("h3", null, "Best memory span (right on the first try)"), spanT));
+  // trickiest + error split
+  const q = ACTS.map(a => ({ a, p: pct(P.activity[a]), n: P.activity[a].recent.length })).filter(x => x.n >= 5);
+  const trick = q.length ? q.reduce((m, x) => (x.p < m.p ? x : m)) : null;
+  const pk = P.activity.peek, errs = pk.orderErr + pk.itemErr;
+  let split, tip = "";
+  if (errs < 5) split = "Who Peeked: not enough tries yet to tell.";
+  else if (pk.orderErr >= pk.itemErr) { split = "Who Peeked: mostly order mix-ups."; tip = "Tip: Order mix-ups are normal at this length; saying names aloud together helps."; }
+  else { split = "Who Peeked: mostly a different pet."; tip = 'Tip: Picking a different pet is common. The "slow" memory pace option can help.'; }
+  s.append(el("div", { class: "gcard" }, el("h3", null, "Trickiest right now"),
+    trick ? el("span", { class: "tchip" }, `${ACT_NAME[trick.a]}  ${trick.p}% first try`) : el("p", { class: "muted" }, "Play a few rounds to see this."),
+    el("p", null, split), tip ? el("p", { class: "muted" }, tip) : null));
+  // per activity
+  s.append(el("div", { class: "gcard" }, el("h3", null, "Activities (first try, last 20 items each)"),
+    el("p", null, ACTS.map(a => { const p = pct(P.activity[a]); return `${ACT_NAME[a]} ${p == null ? "—" : p + "%"}`; }).join(" · "))));
+  // levels
+  const lt = el("table", null, el("tr", null, el("th", null, "Level"), el("th", null, "Rounds"), el("th", null, "Best"), el("th", null, "Got it"), el("th", null, "First try (last 3)")));
+  for (let n = 1; n <= 8; n++) {
+    const L = lv(n), ft = L.recent.reduce((x, y) => x + y, 0), tot = L.recentN.reduce((x, y) => x + y, 0);
+    lt.append(el("tr", null, el("td", null, `${LEVELS[n].e} ${LEVELS[n].name}`), el("td", null, String(L.rounds)), el("td", null, L.rounds ? "★".repeat(L.bestStars) + "☆".repeat(3 - L.bestStars) : "—"), el("td", null, L.mastered ? "🎀 yes" : "no"), el("td", null, tot ? Math.round(100 * ft / tot) + "%" : "—")));
+  }
+  s.append(el("div", { class: "gcard" }, el("h3", null, "Levels"), lt));
+  // sessions
+  const sc = el("div", { class: "gcard" }, el("h3", null, "Sessions"), el("p", null, `Total: ${Math.round((P.totalMs || 0) / 60000)} minutes`));
+  P.sessions.slice().reverse().forEach(x => sc.append(el("p", { style: "margin:4px 0" }, `${x.date} · ${x.mins} min · ${(x.levels || []).join(", ") || "—"} · ★ ${x.stars || 0}`)));
+  s.append(sc);
+  // sound switches
+  const sw = (label, key) => {
+    const b = el("button", { class: "sw", role: "switch", "aria-checked": String(setting(key) !== false) }, el("span", null, label), el("span", { class: "knob", "aria-hidden": "true" }));
+    b.onclick = () => { const v = b.getAttribute("aria-checked") !== "true"; writeHubSetting(key, v); b.setAttribute("aria-checked", String(v)); if (key === "voice" && v) Voice.say("Hi! I'm Pip."); if (key === "soundEffects" && v) Sound.play("chime"); };
+    return b;
+  };
+  const summary = `Current: rounds ${S.rounds()} · items ${S.items()} · pace ${S.pace()} · memory ${S.offset() >= 0 ? "+" : ""}${S.offset()} · adaptive ${S.adaptive() ? "on" : "off"} · break ${S.petBreak() ? "on" : "off"} · demos ${S.demos() ? "on" : "off"} · labels ${S.labels() ? "on" : "off"} · cross-off ${S.crossOff() ? "on" : "off"} · replay ${S.replay() ? "on" : "off"} · all levels open ${S.unlockAll() ? "yes" : "no"} · speech rate ${S.rate()}`;
+  s.append(el("div", { class: "gcard" }, el("h3", null, "Sound"), sw("Read aloud (voice)", "voice"), sw("Sound effects", "soundEffects"),
+    el("p", { class: "muted" }, "Other game options are set in games.js (memory pace, rounds…)."), el("p", { class: "muted" }, summary)));
+  // reset
+  const rbox = el("div", { class: "gcard resetbox" });
+  const rbtn = el("button", { class: "ghost" }, "Reset progress");
+  rbox.append(el("h3", null, "Reset"), rbtn);
+  rbtn.onclick = () => {
+    rbtn.hidden = true;
+    const yes = el("button", { class: "btn pop", disabled: true }, "Yes, reset");
+    const keep = el("button", { class: "ghost" }, "Keep it");
+    rbox.append(el("p", null, "This clears all pets, stars and history on this iPad."), el("div", { class: "row" }, yes, keep));
+    setTimeout(() => yes.removeAttribute("disabled"), 2000);
+    keep.onclick = () => grownUps();
+    yes.onclick = () => {
+      try { if (window.Hub && typeof Hub.clear === "function") Hub.clear(); } catch (e) {}
+      P = freshProgress(); R = null; SESSION = null; store.save("probe", 1);
+      home();
+    };
+  };
+  s.append(rbox);
+}
+
+/* ---------------- start ---------------- */
+home();
+</script>
+</body>
+</html>
