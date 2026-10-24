@@ -933,7 +933,7 @@ function genHelper(n, level) {
 const sameTile = (a, b) => !!a && !!b && a.e === b.e && (a.size || "") === (b.size || "") && !!a.flip === !!b.flip;
 function genNext(set) {
   const bank = set === "L1" ? NEXT_L1 : set === "L3" ? NEXT_L3 : NEXT_T;
-  const item = bank[pickIdx("next" + set, bank.length)];
+  const bi = pickIdx("next" + set, bank.length), item = bank[bi];
   const q = item.t.indexOf("?");
   const full = item.t.map(x => (x === "?" ? item.a : x));
   let p = 1; // the repeating unit = the smallest period of the full row
@@ -947,21 +947,22 @@ function genNext(set) {
     const dis = pick(PEEK_POOL.filter(e => !members.includes(e)));
     choices = [T(item.a.e), T(other), T(dis)];
   }
-  return { tiles: item.t, full, q, ans: item.a, unit: p, choices: shuffle(choices), kind: item.kind || "" };
+  return { tiles: item.t, full, q, ans: item.a, unit: p, choices: shuffle(choices), kind: item.kind || "", id: `next:${set}:${bi + 1}` };
 }
 function genOdd(set) {
   let item, hint;
-  if (set === "L2") { item = ODD_L2[pickIdx("oddL2", ODD_L2.length)]; hint = item.hint || L2HINT; }
-  else { item = ODD_L5[pickIdx("oddL5", ODD_L5.length, i => !ODD_L5_LATE.includes(i) || (R && R.oddFT >= 2))]; hint = item.hint; }
+  let bi;
+  if (set === "L2") { bi = pickIdx("oddL2", ODD_L2.length); item = ODD_L2[bi]; hint = item.hint || L2HINT; }
+  else { bi = pickIdx("oddL5", ODD_L5.length, i => !ODD_L5_LATE.includes(i) || (R && R.oddFT >= 2)); item = ODD_L5[bi]; hint = item.hint; }
   const tiles = item.t.map((t, i) => Object.assign({}, t, { ans: i === item.a }));
   const sh = shuffle(tiles);
-  return { tiles: sh, ansIdx: sh.findIndex(t => t.ans), hint, rule: item.rule };
+  return { tiles: sh, ansIdx: sh.findIndex(t => t.ans), hint, rule: item.rule, id: `odd:${set}:${bi + 1}` };
 }
 function genWho(set) {
   const bank = set === "L8" ? WHO_L8 : WHO_L6;
-  const [cs, ans, clues] = bank[pickIdx("who" + set, bank.length)];
+  const bi = pickIdx("who" + set, bank.length), [cs, ans, clues] = bank[bi];
   return {
-    cards: shuffle(E(cs)), ans,
+    cards: shuffle(E(cs)), ans, id: `who:${set}:${bi + 1}`,
     clues: clues.map(([text, icon, fits]) => ({ text, icon: icon === "FEATHER" ? EM.feather : icon, fits: E(fits) })),
   };
 }
@@ -976,31 +977,32 @@ function genPens(set, forceRule) {
     ]);
     return {
       pens: [{ key: "house", se: "🏠", word: "fur" }, { key: "nest", se: EM.nest, word: "feathers" }, { key: "pond", se: "💧", word: "fish" }],
-      pets, say: "Furry pets go in the house. Feathers go in the nest. Fish go in the pond.",
+      rule: "fur-feathers-fish", pets, say: "Furry pets go in the house. Feathers go in the nest. Fish go in the pond.",
     };
   }
   if (set === "L4") {
     const rules = ["collar", "size", "kind", "fishbird"];
     const rule = forceRule || rules[pickIdx("pensL4", rules.length)];
+    const tag = c => Object.assign(c, { rule }); // rule name for tracking
     if (rule === "collar") {
       const es = pickPets(PEEK_POOL, 4), cols = shuffle(["red", "red", "blue", "blue"]);
-      return {
+      return tag({
         pens: [{ key: "red", dot: "red", word: "red collar" }, { key: "blue", dot: "blue", word: "blue collar" }],
         pets: es.map((e, i) => ({ t: T(e, { collar: cols[i] }), pen: cols[i], fact: `This ${nm(e)} has a ${cols[i]} collar.` })),
         say: "Put each pet in the right pen. Red collar or blue collar?",
-      };
+      });
     }
     if (rule === "size") {
       const [a, b] = shuffle(["🐶", "🐱", "🐰", "🐹", "🐴", "🐢"]).slice(0, 2);
       const pets = shuffle([[a, "b"], [a, "s"], [b, "b"], [b, "s"]]).map(([e, z]) => ({ t: T(e, { size: z }), pen: z, fact: `This ${nm(e)} is ${z === "b" ? "big" : "small"}.` }));
-      return { pens: [{ key: "b", se: "🔼", word: "big" }, { key: "s", se: "🔽", word: "small" }], pets, say: "Put each pet in the right pen. Big or small?" };
+      return tag({ pens: [{ key: "b", se: "🔼", word: "big" }, { key: "s", se: "🔽", word: "small" }], pets, say: "Put each pet in the right pen. Big or small?" });
     }
     if (rule === "kind") {
       const pets = shuffle([["🐶", "b"], ["🐶", "s"], ["🐱", "b"], ["🐱", "s"]]).map(([e, z]) => ({ t: T(e, { size: z }), pen: e, fact: `This is ${art(nm(e))} ${nm(e)}.` }));
-      return { pens: [{ key: "🐶", se: "🐶", word: "dogs" }, { key: "🐱", se: "🐱", word: "cats" }], pets, say: "Put each pet in the right pen. Dogs or cats?" };
+      return tag({ pens: [{ key: "🐶", se: "🐶", word: "dogs" }, { key: "🐱", se: "🐱", word: "cats" }], pets, say: "Put each pet in the right pen. Dogs or cats?" });
     }
     const pets = shuffle([["🐠", "b"], ["🐠", "s"], ["🦜", "b"], ["🦜", "s"]]).map(([e, z]) => ({ t: T(e, { size: z }), pen: e === "🐠" ? "fish" : "bird", fact: e === "🐠" ? "This is a fish." : "A parrot is a bird." }));
-    return { pens: [{ key: "fish", se: "💧", word: "fish" }, { key: "bird", se: "🌳", word: "birds" }], pets, say: "Put each pet in the right pen. Fish or birds?" };
+    return tag({ pens: [{ key: "fish", se: "💧", word: "fish" }, { key: "bird", se: "🌳", word: "birds" }], pets, say: "Put each pet in the right pen. Fish or birds?" });
   }
   // L7: rules from what she knows, 6 pets, 3 per pen
   const R7 = [
@@ -1012,7 +1014,7 @@ function genPens(set, forceRule) {
   const r = R7[pickIdx("pensL7", R7.length)];
   const ga = pickPets(POOL[r.a], 3), gb = pickPets(POOL[r.b].filter(e => !ga.includes(e)), 3, ga);
   const pets = shuffle([...ga.map(e => ({ t: T(e), pen: "a", fact: `${A(e)} ${r.fa}` })), ...gb.map(e => ({ t: T(e), pen: "b", fact: `${A(e)} ${r.fb}` }))]);
-  return { pens: r.pens, pets, say: r.say };
+  return { pens: r.pens, pets, say: r.say, rule: r.a + "-" + r.b };
 }
 function tileName(t, kind) {
   // facing patterns are spoken as "this way" / "the other way", never left/right
@@ -1118,8 +1120,12 @@ function makeCtx(item, demo, onDone) {
       return live(opts.hmm && !Voice.on() ? Promise.all([sp, new Promise(r => setTimeout(r, 1800))]) : sp);
     },
     setHear(fn) { setHear(fn); },
-    logErr(kind) { if (demo) return; const a = P.activity[item.t]; if (kind === "order") a.orderErr++; else a.itemErr++; saveP(); },
-    miss() { this.misses++; Sound.play("hmm"); if (this.misses >= 2) { this.shown = true; return "show"; } return "hint"; },
+    t0: performance.now(), hints: 0, firstErr: "",
+    logErr(kind) {
+      if (!this.firstErr) this.firstErr = (ERR_CODE[item.t] || {})[kind] || "wrong-item";
+      if (demo) return; const a = P.activity[item.t]; if (kind === "order") a.orderErr++; else a.itemErr++; saveP();
+    },
+    miss() { this.misses++; Sound.play("hmm"); if (this.misses >= 2) { this.shown = true; return "show"; } this.hints++; return "hint"; },
     result() { return this.shown ? "shown" : this.misses ? "second" : "first"; },
     // Right answer / end of item: praise, then advance when Pip finishes or
     // after 1.2 s, whichever is later (capped). A tap skips the wait.
@@ -1197,12 +1203,14 @@ ACT.peek = ctx => {
     ctx.say("Your turn! Tap them in order.");
     if (S.replay() && !answered) ctx.setHear(async () => {
       if (ctx.phase !== "answer" || answered) return;
+      ctx.hints++; // a replay counts as a hint for tracking
       ctx.phase = "showing"; ctx.setHear(null); ctx.bubble("Watch… 👀");
       await show(PACE_MS()); answerPhase();
     });
   }
   ready.onclick = async () => {
     if (ctx.phase !== "ready") return;
+    ctx.t0 = performance.now();
     ready.remove(); ctx.phase = "showing"; ctx.bubble("Watch… 👀"); Voice.cancel();
     await sleep(350); await show(PACE_MS()); answerPhase();
   };
@@ -1279,12 +1287,14 @@ ACT.hide = ctx => {
     ctx.say(askText()); F.chip.textContent = asks[q];
     if (S.replay() && !answered) ctx.setHear(async () => {
       if (ctx.phase !== "answer" || answered) return;
+      ctx.hints++; // a replay counts as a hint for tracking
       ctx.phase = "showing"; ctx.setHear(null); ctx.bubble("Look… 👀");
       await peekAll(openMs); ask(true);
     });
   }
   ready.onclick = async () => {
     if (ctx.phase !== "ready") return;
+    ctx.t0 = performance.now();
     ready.remove(); ctx.phase = "showing"; ctx.bubble("Look… 👀"); Voice.cancel();
     await sleep(250); await peekAll(openMs); ask();
   };
@@ -1308,6 +1318,7 @@ ACT.hide = ctx => {
     qMiss++; ctx.misses++; Sound.play("hmm");
     ctx.phase = "showing";
     if (qMiss === 1) {
+      ctx.hints++;
       await ctx.say("Let's peek again.", { hmm: true });
       await peekAll(openMs / 2);
       ask(true);
@@ -1355,12 +1366,14 @@ ACT.helper = ctx => {
     ctx.phase = "answer"; unlockAvail(); ctx.say("Your turn!");
     if (S.replay() && !answered) ctx.setHear(async () => {
       if (ctx.phase !== "answer" || answered) return;
+      ctx.hints++; // a replay counts as a hint for tracking
       ctx.phase = "showing"; ctx.setHear(null); lock(tEls, true); lock(pEls, true);
       await readJob(); answerPhase();
     });
   }
   ready.onclick = async () => {
     if (ctx.phase !== "ready") return;
+    ctx.t0 = performance.now();
     ready.remove(); ctx.phase = "showing"; Voice.cancel();
     await readJob(); answerPhase();
   };
@@ -1842,8 +1855,32 @@ function runItem() {
   ctx.content = genContent(it, ctx);
   ACT[it.t](ctx);
 }
+// Answer tracking for the adaptive practice engine (see CLAUDE.md "Tracking answers").
+const SKILL = { peek: "memory.sequence", hide: "memory.location", helper: "memory.instructions", next: "logic.pattern", odd: "logic.odd-one-out", pens: "logic.classify", who: "logic.deduction" };
+const ERR_CODE = {
+  peek: { order: "order", item: "wrong-item" }, hide: { item: "wrong-door" }, helper: { order: "order", item: "wrong-step" },
+  next: { item: "wrong-item" }, odd: { item: "wrong-item" }, pens: { item: "wrong-pen" }, who: { item: "wrong-card" },
+};
+function trackItem(t, res, ctx) {
+  try {
+    if (!window.Hub || typeof Hub.track !== "function" || ctx.demo) return;
+    const c = ctx.content || {}, it = ctx.item || {};
+    let item = t, data = {};
+    if (t === "peek") { item = "peek:" + c.seq.join(""); data = { size: c.seq.length, choices: c.choices.length }; }
+    else if (t === "hide") { item = `hide:${c.doors}:` + c.pets.map(p => p + c.pos[p]).join("") + ":" + c.asks.join(""); data = { size: c.pets.length, doors: c.doors, asked: c.asks.length }; }
+    else if (t === "helper") { item = "helper:" + c.steps.map(x => x.treat + x.pet).join(","); data = { size: c.steps.length, treats: c.shelf.length }; }
+    else if (t === "pens") { item = `pens:${it.set}:${c.rule || ""}:` + c.pets.map(x => x.t.e).join(""); data = { pens: c.pens.length, pets: c.pets.length, rule: c.rule || "" }; }
+    else { item = c.id || t; data = t === "who" ? { clues: c.clues.length } : t === "next" ? { kind: c.kind || "plain", length: c.tiles.length } : {}; }
+    if (MEM.includes(t)) { data.levelSize = it.sz; data.adaptive = R.adaptive.delta; data.offset = S.offset(); }
+    Hub.track({
+      skill: SKILL[t], level: R.level, item, correct: res !== "shown", firstTry: res === "first" && !ctx.hints,
+      hints: ctx.hints, ms: performance.now() - ctx.t0, error: ctx.firstErr || "", data,
+    });
+  } catch (e) {}
+}
 function itemDone(res, ctx) {
   const t = R.plan[R.idx].t, a = P.activity[t];
+  trackItem(t, res, ctx);
   a.tries++; if (res === "first") a.firstTry++;
   a.recent.push(res === "first" ? 1 : 0); while (a.recent.length > 20) a.recent.shift();
   if (res === "first" && MEM.includes(t) && ctx.span) updateSpan(t, ctx.span);

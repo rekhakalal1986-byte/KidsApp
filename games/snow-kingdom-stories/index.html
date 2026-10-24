@@ -777,7 +777,9 @@ function placement() {
   let i = 0; const res = [];
   const show = () => {
     if (i >= PLACEMENT.length) return finish();
-    const q = PLACEMENT[i];
+    const q = PLACEMENT[i], t0 = performance.now();
+    const tk = (ok, err, x) => tkTrack({ skill: 'math.wordproblem.' + PLACE_SKILL[i], level: PLACE_LEVEL[i], item: `placement:${i + 1}`, correct: ok, firstTry: ok,
+      hints: 0, ms: performance.now() - t0, error: err, data: { placement: true, answer: x } });
     screen(`<div class="wrap">
       <div class="bar"><button class="btn ghost sm" id="quit">Back to trail</button><div class="dots">${PLACEMENT.map((_, k) => `<span class="d5 ${k < i ? 'ok' : ''} ${k === i ? 'cur' : ''}"></span>`).join('')}</div><span></span></div>
       <p class="lead">Just try your best. You can use toys or draw on paper too!</p>
@@ -785,8 +787,8 @@ function placement() {
       <section class="work"><p class="prompt">What’s the answer?</p><div id="pad"></div><div class="row center" style="margin-top:14px"><button class="btn ghost sm" id="skip">I’m not sure</button></div></section></div>`);
     $('#quit').onclick = home; $('#hear').onclick = () => Voice.say(q.t);
     Voice.say(q.t);
-    pad($('#pad'), x => { res.push(x === q.a); i++; show(); });
-    $('#skip').onclick = () => { res.push(false); i++; show(); };
+    pad($('#pad'), x => { tk(x === q.a, x === q.a ? '' : 'wrong-answer', x); res.push(x === q.a); i++; show(); });
+    $('#skip').onclick = () => { tk(false, 'skipped', null); res.push(false); i++; show(); };
   };
   const finish = () => {
     const ok = k => res[k];
@@ -803,6 +805,18 @@ function placement() {
   };
   show();
 }
+
+/* ---------------- answer tracking (CLAUDE.md "Tracking answers") ---------------- */
+// One Hub.track per finished story problem (and per placement-check item).
+// This only reads what happened; the game's own saving and flow are unchanged.
+const TK_SKILL = { join_res: 'join', leave_res: 'separate', put_total: 'part-whole', join_chg: 'missing-part', leave_chg: 'missing-part', apart: 'missing-part',
+  join_start: 'start-unknown', leave_start: 'start-unknown', cmp_diff: 'compare', cmp_big: 'compare', cmp_small: 'compare', three: 'three-addends', two_step: 'two-step' };
+const tkSkill = p => 'math.wordproblem.' + (p.big2 ? 'two-digit' : (TK_SKILL[p.type] || 'join'));
+const PLACE_SKILL = ['join', 'separate', 'part-whole', 'missing-part', 'missing-part', 'start-unknown', 'compare', 'three-addends'];
+const PLACE_LEVEL = [1, 1, 2, 3, 3, 4, 5, 6];
+function tkTrack(e) { try { if (window.Hub && typeof Hub.track === 'function') Hub.track(e); } catch (err) {} }
+// a mistake on the current problem: counts as a hint (every mistake shows one) and keeps the first error code
+function tkMiss(code) { if (!P || !P.tk) return; P.tk.hints++; if (!P.tk.err) P.tk.err = code; }
 
 /* ---------------- a round of stories ---------------- */
 let P = null;
@@ -853,6 +867,7 @@ function nextProblem() {
   if (P.idx >= P.list.length) return roundEnd();
   const p = P.list[P.idx];
   P.p = p; P.flow = flowFor(p); P.step = 0; P.firstTry = true; P.revealed = P.flow[0] !== 'numberless';
+  P.tk = { t0: performance.now(), hints: 0, err: '', shown: false };
   const dots = P.list.map((_, i) => `<span class="d5 ${i < P.results.length ? (P.results[i] ? 'ok' : 'miss') : ''} ${i === P.idx ? 'cur' : ''}"></span>`).join('');
   screen(`<div class="wrap play">
     <div class="bar"><button class="btn ghost sm" id="quit">Back to trail</button>
@@ -891,7 +906,7 @@ const STEPS = {
         Voice.say((right === 'more' ? 'Yes! Some more came, so there will be more.' : 'Yes! Some went away, so there will be fewer.') + ' Here are the numbers. ' + p.text);
         later(advance, 1200);
       } else {
-        tries++; b.classList.add('wrong'); b.disabled = true; S.mistakes.sort++; save();
+        tries++; b.classList.add('wrong'); b.disabled = true; S.mistakes.sort++; save(); tkMiss('sort');
         const h = 'Picture it. Did some come, or did some go?';
         $('#hint').textContent = h; Voice.say(h + ' ' + p.numberless);
       }
@@ -905,7 +920,7 @@ const STEPS = {
     let tries = 0;
     $$('.choice', w).forEach(b => b.onclick = () => {
       if (b.dataset.v === p.sit) { b.classList.add('right'); markChoices(w); Voice.say(SIT_YES[p.sit]); later(advance, 1300); return; }
-      tries++; S.mistakes.sort++; save(); b.classList.add('wrong'); b.disabled = true;
+      tries++; S.mistakes.sort++; save(); tkMiss('sort'); b.classList.add('wrong'); b.disabled = true;
       let h = 'Picture it in your head. Does something come or go? Or are two groups just there together?' + (P.level >= 5 ? ' Or are we comparing who has more?' : '');
       if (tries >= 2) {
         h = `This one is “${SIT_LABEL[p.sit]}.” ${SIT_WHY[p.sit]}`;
@@ -946,7 +961,7 @@ const STEPS = {
       if (picked.length < 2) return;
       const [a, c] = picked;
       if (good(a, c)) { $('#hint').textContent = ''; return finish(a, c); }
-      wrongs++;
+      wrongs++; tkMiss('ten-pair');
       const h = `${p.nums[a]} + ${p.nums[c]} = ${p.nums[a] + p.nums[c]}. That’s not 10, and they’re not the same. Try another pair.`;
       picked = []; $$('.tile', w).forEach(t => { t.classList.remove('sel'); t.setAttribute('aria-pressed', 'false'); });
       if (wrongs >= 2) {
@@ -971,7 +986,7 @@ const STEPS = {
       $$('#ch .choice', w).forEach(b => b.onclick = () => {
         const o = s.eq[+b.dataset.i];
         if (!o.ok) {
-          tries++; b.classList.add('wrong'); b.disabled = true;
+          tries++; b.classList.add('wrong'); b.disabled = true; tkMiss(o.tag === 'op' ? 'wrong-op' : 'order');
           const h = o.tag === 'op' ? msgs.op : (k === 0 ? 'Start at the beginning of the story. What happens first?' : `Start from what’s there after the first part: ${p.steps[0].ans}.`);
           $('#hint').textContent = h; Voice.say(h);
           if (tries < 2) return;
@@ -985,7 +1000,7 @@ const STEPS = {
             api.disable(); s.done = s.eq.find(o2 => o2.ok).t.map(t => t === '?' ? String(x) : t);
             k++; if (k < p.steps.length) { Voice.say(`Yes, ${x}.`); later(stepUI, 900); } else { Voice.say(`Yes! ${x}.`); later(advance, 900); }
           } else {
-            ptries++; P.firstTry = false; api.clear();
+            ptries++; P.firstTry = false; api.clear(); tkMiss('wrong-answer'); if (ptries >= 3) P.tk.shown = true;
             const h = ptries >= 3 ? `It’s ${s.ans}. ${eqSay(s.eq.find(o2 => o2.ok).t.map(t => t === '?' ? String(s.ans) : t))}.` : 'Not quite. Count carefully. You can count on from the bigger number.';
             $('#hint').textContent = h; Voice.say(h);
             if (ptries >= 3) { api.disable(); s.done = s.eq.find(o2 => o2.ok).t.map(t => t === '?' ? String(s.ans) : t); k++; later(k < p.steps.length ? stepUI : advance, 2800); }
@@ -1008,11 +1023,14 @@ const STEPS = {
       if (x === p.answer) { api.disable(); $('#hint').textContent = ''; Voice.say(`${x}! Now, ${x} what?`); later(advance, 500); return; }
       tries++; P.firstTry = false; api.clear();
       if (tries >= 3) {
+        tkMiss('wrong-answer'); P.tk.shown = true;
         api.disable(); const s = `The answer is ${p.answer}. ${p.okLine}`;
         $('#hint').innerHTML = esc(s) + '<br><button class="btn" id="kg" style="margin-top:10px">Keep going</button>';
         Voice.say(s); $('#kg').onclick = advance; return;
       }
+      const before = S.mistakes.addedAll + ',' + S.mistakes.moreAdd, a0 = S.mistakes.addedAll;
       const m = analyze(p, x); $('#hint').textContent = m; Voice.say(m);
+      tkMiss(before === S.mistakes.addedAll + ',' + S.mistakes.moreAdd ? 'wrong-answer' : S.mistakes.addedAll > a0 ? 'added-all' : 'more-add');
     });
   },
   label() {
@@ -1023,7 +1041,7 @@ const STEPS = {
     $$('.choice', w).forEach(b => b.onclick = () => {
       const o = list[+b.dataset.i];
       if (o.ok) { b.classList.add('right'); markChoices(w); later(advance, 700); return; }
-      S.mistakes.label++; save(); b.classList.add('wrong'); b.disabled = true;
+      S.mistakes.label++; save(); tkMiss('label'); b.classList.add('wrong'); b.disabled = true;
       const h = o.silly ? `${p.answer} ${o.v}? That would be silly! Look at the question again.` : 'Look at the question again. What is it asking about?';
       $('#hint').textContent = h; Voice.say(h);
     });
@@ -1032,6 +1050,12 @@ const STEPS = {
     const p = P.p, w = $('#work');
     const ok = P.firstTry; const gain = ok ? 2 : 1;
     S.snowflakes += gain; P.results.push(ok); save();
+    if (P.tk && !P.tk.sent) {
+      P.tk.sent = true;
+      tkTrack({ skill: tkSkill(p), level: P.level, item: `${p.type}${p.big2 ? '+2d' : ''}:${(p.nums || []).join(',')}=${p.answer}`,
+        correct: !P.tk.shown, firstTry: P.firstTry && !P.tk.hints, hints: P.tk.hints, ms: performance.now() - P.tk.t0, error: P.tk.err,
+        data: { type: p.type, model: p.model, review: !!p.review, answer: p.answer } });
+    }
     const last = P.idx + 1 >= P.list.length;
     w.innerHTML = `<div class="win"><div class="tick" aria-hidden="true">✓</div><p class="answer">${p.answer} ${esc(p.label)}</p>
       <p class="prompt">Check it: ${esc(p.okLine)}</p><p class="sub">Does it make sense in the story? Yes!</p>
@@ -1068,7 +1092,7 @@ function drawCircles() {
     });
   };
   const fail = (msg, fix) => {
-    wrongs++; S.mistakes.draw++; save();
+    wrongs++; S.mistakes.draw++; save(); tkMiss('draw');
     if (wrongs >= 3) { fix(); $('#hint').textContent = 'Here’s how it looks.'; Voice.say('Here’s how it looks.'); paint(); later(() => { const d = $('#done'); if (d) d.click(); }, 1600); wrongs = 0; return; }
     $('#hint').textContent = msg; Voice.say(msg);
   };
@@ -1109,6 +1133,7 @@ function drawMountain() {
     const okBase = [got.l, got.r].sort().join() === [String(m.l), String(m.r)].sort().join();
     if (okTop && okBase) return { ok: true };
     if (!okTop) { S.mistakes.totalSpot++; save(); }
+    tkMiss(okTop ? 'partners' : 'total-spot');
     const msg = !okTop
       ? (String(m.top) === '?' ? 'Do we know the total? The story asks for it, so the mystery box goes on top.' : 'Do I know the total? The total is all of them together, and it goes on top.')
       : 'The top is right! Check the partners.';
@@ -1127,13 +1152,14 @@ function drawBars() {
       ${barsHTML(b, true)}<div class="tray" id="tray"></div><div class="row center"><button class="btn" id="chk" disabled>Check my bars</button></div><p class="hint" id="hint"></p>`;
     slotGame(w, [b.big.val, b.small.val, b.diff], ['big', 'small', 'diff'], got => {
       if (got.big === String(b.big.val) && got.small === String(b.small.val) && got.diff === String(b.diff)) return { ok: true };
+      tkMiss('bars');
       const msg = got.big !== String(b.big.val) ? `${b.big.name} has more, so ${b.big.name}’s number goes on the long bar.` : 'The extra piece is the difference: how many more.';
       return { msg, solution: { big: b.big.val, small: b.small.val, diff: b.diff } };
     }, auto => { Voice.say(`${b.big.name}: ${sayVal(b.big.val)}. ${b.small.name}: ${sayVal(b.small.val)}. The extra piece: ${sayVal(b.diff)}.`, auto); later(advance, auto ? 3600 : 2000); });
   };
   $$('.choice', w).forEach(btn => btn.onclick = () => {
     if (btn.dataset.v === b.big.name) { btn.classList.add('right'); markChoices(w); Voice.say(`Yes! ${b.big.name} has more.`); later(phase2, 1100); return; }
-    tries++; btn.classList.add('wrong'); btn.disabled = true;
+    tries++; btn.classList.add('wrong'); btn.disabled = true; tkMiss('who-has-more');
     const h = tries >= 2 ? `${b.big.name} has more. Read it again to see why.` : 'Read it again carefully. Who has the bigger amount?';
     $('#hint').textContent = h; Voice.say(h);
     if (tries >= 2) { markChoices(w); later(phase2, 2600); }
@@ -1150,6 +1176,7 @@ function writeStep(which) {
     const o = list[+b.dataset.i];
     if (o.ok) { b.classList.add('right'); markChoices(w); p.solveEq = o.t; Voice.say('Yes! ' + eqSay(o.t)); later(advance, 1500); return; }
     tries++; b.classList.add('wrong'); b.disabled = true;
+    tkMiss(which === 2 ? 'easy-equation' : o.tag === 'addAll' ? 'added-all' : o.tag === 'moreAdd' ? 'more-add' : o.tag === 'op' ? 'wrong-op' : o.tag === 'order' ? 'order' : 'mystery-place');
     let h;
     if (which === 2) h = 'Which one finds the mystery number right away?';
     else if (o.tag === 'addAll') { h = 'That one adds every number. Does the story really put them all together?'; S.mistakes.addedAll++; }

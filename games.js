@@ -6,6 +6,10 @@
 window.HUB = {
   title: "Anvesha's Learning World", // shown in the top bar and browser tab
   name: "Anvesha",                  // used in the greeting; set to "" to hide
+  backend: {                        // progress server; connect a device on grownups.html
+    url: "https://anvesha-learn.duckdns.org",
+    email: "anvesha@learning.home", // pre-filled on the connect form (the password is never stored in files)
+  },
 };
 
 // SETTINGS — apply to every game. To change one game only, add

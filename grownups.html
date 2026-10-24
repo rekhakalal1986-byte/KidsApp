@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1E1B4B">
+<meta name="robots" content="noindex">
+<link rel="icon" href="assets/icon-192.png">
+<title>For grown-ups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;800&family=Lexend:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --night: #1E1B4B; --ice: #E0F2FE; --aurora: #5EEAD4; --sun: #FDE047; --snow: #FFFFFF; --rose: #FDA4AF;
+    --display: "Grandstander", "Comic Sans MS", system-ui, sans-serif;
+    --body: "Lexend", "Segoe UI", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: var(--night); color: var(--snow); font-family: var(--body); line-height: 1.5; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+  a { color: var(--aurora); }
+  h1 { font-family: var(--display); font-weight: 800; font-size: 2.2rem; margin: 1rem 0 .25rem; }
+  .lead { color: var(--ice); opacity: .85; margin: 0 0 1.5rem; }
+  .card { background: rgba(224, 242, 254, .07); border: 2px solid rgba(224, 242, 254, .2); border-radius: 22px; padding: 1.25rem; margin-bottom: 1.25rem; }
+  h2 { font-family: var(--display); font-size: 1.4rem; margin: 0 0 .75rem; }
+  .status { display: flex; align-items: center; gap: .6rem; font-size: 1.1rem; margin-bottom: .75rem; }
+  .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--rose); flex: none; }
+  .dot.ok { background: var(--aurora); }
+  dl { display: grid; grid-template-columns: auto 1fr; gap: .25rem 1rem; margin: 0 0 1rem; color: var(--ice); }
+  dt { opacity: .7; }
+  dd { margin: 0; overflow-wrap: anywhere; }
+  label { display: block; margin: .75rem 0 .3rem; color: var(--ice); }
+  input { width: 100%; font: inherit; font-size: 1.05rem; padding: .7rem .9rem; min-height: 52px; border-radius: 14px; border: 2px solid rgba(224,242,254,.35); background: rgba(0,0,0,.25); color: var(--snow); }
+  .row { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1rem; }
+  button { font: 500 1.05rem var(--body); min-height: 52px; padding: .6rem 1.3rem; border-radius: 999px; border: 0; cursor: pointer; background: var(--aurora); color: var(--night); }
+  button.quiet { background: transparent; color: var(--ice); border: 2px solid rgba(224,242,254,.35); }
+  button:disabled { opacity: .5; cursor: default; }
+  .msg { min-height: 1.5em; margin: .75rem 0 0; }
+  .msg.err { color: var(--rose); }
+  .note { font-size: .92rem; color: var(--ice); opacity: .75; }
+  a:focus-visible, button:focus-visible, input:focus-visible { outline: 4px solid var(--sun); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="./">← Back to the games</a>
+  <h1>For grown-ups</h1>
+  <p class="lead">Connect this device so progress is saved to your server and follows her everywhere.</p>
+
+  <section class="card">
+    <h2>This device</h2>
+    <div class="status"><span class="dot" id="dot"></span><span id="state">Checking…</span></div>
+    <dl>
+      <dt>Server</dt><dd id="server">–</dd>
+      <dt>Waiting to send</dt><dd id="queued">–</dd>
+      <dt>Last sent</dt><dd id="last">–</dd>
+    </dl>
+    <div class="row">
+      <button type="button" id="syncBtn" class="quiet">Send now</button>
+      <button type="button" id="disconnectBtn" class="quiet" hidden>Disconnect this device</button>
+    </div>
+    <p class="msg" id="syncMsg" role="status"></p>
+  </section>
+
+  <section class="card" id="connectCard">
+    <h2>Connect</h2>
+    <form id="connectForm" autocomplete="on">
+      <label for="email">Her account email</label>
+      <input id="email" name="email" type="email" autocomplete="username" required>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+      <div class="row"><button type="submit" id="connectBtn">Connect this device</button></div>
+      <p class="msg" id="connectMsg" role="status"></p>
+    </form>
+    <p class="note">You only do this once per device. It stays connected while she keeps playing (each visit renews it for 90 days). Use her own browser profile on a shared laptop.</p>
+  </section>
+</div>
+
+<script src="games.js"></script>
+<script src="shared/hub.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var B = (window.HUB && window.HUB.backend) || {};
+
+  function when(t) {
+    if (!t) return "never";
+    var mins = Math.round((Date.now() - t) / 60000);
+    if (mins < 1) return "just now";
+    if (mins < 60) return mins + " min ago";
+    if (mins < 1440) return Math.round(mins / 60) + " h ago";
+    return new Date(t).toLocaleString();
+  }
+
+  function render() {
+    var s = Hub.status();
+    $("server").textContent = s.server || "not set (add HUB.backend in games.js)";
+    $("queued").textContent = s.queued + (s.queued === 1 ? " answer" : " answers");
+    $("last").textContent = when(s.lastSync);
+    $("dot").className = "dot" + (s.connected ? " ok" : "");
+    $("state").textContent = s.connected ? "Connected as " + s.email
+      : s.expired ? "Signed out — please connect again" : "Not connected";
+    $("disconnectBtn").hidden = !s.connected && !s.expired;
+    $("connectCard").hidden = s.connected;
+    if (!$("email").value) $("email").value = s.email || B.email || "";
+  }
+
+  $("connectForm").onsubmit = function (e) {
+    e.preventDefault();
+    var btn = $("connectBtn"), msg = $("connectMsg");
+    btn.disabled = true; msg.className = "msg"; msg.textContent = "Connecting…";
+    Hub.connect($("email").value.trim(), $("password").value).then(function () {
+      $("password").value = ""; msg.textContent = ""; render();
+      $("syncMsg").className = "msg"; $("syncMsg").textContent = "Connected. 🎉";
+    }, function (err) {
+      msg.className = "msg err";
+      msg.textContent = err.status === 400 ? "That email or password didn't work." : "Couldn't reach the server. Check the internet and try again.";
+    }).then(function () { btn.disabled = false; });
+  };
+
+  $("syncBtn").onclick = function () {
+    var msg = $("syncMsg"); msg.className = "msg"; msg.textContent = "Sending…";
+    Hub.sync().then(function (ok) {
+      render();
+      var s = Hub.status();
+      if (!s.connected) { msg.className = "msg err"; msg.textContent = "Connect this device first."; }
+      else if (ok === false) { msg.className = "msg err"; msg.textContent = "Couldn't reach the server — answers stay saved here and go later."; }
+      else msg.textContent = s.queued ? "Sent some; more on the way." : "All sent.";
+    });
+  };
+
+  $("disconnectBtn").onclick = function () { Hub.disconnect(); render(); $("syncMsg").textContent = "Disconnected. Answers stay saved on this device."; };
+
+  render();
+  setInterval(render, 5000);
+})();
+</script>
+</body>
+</html>
